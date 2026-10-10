@@ -1,26 +1,33 @@
 .tappable-paragraph {
-  line-height: 1.8;
-  margin: 0 0 1em;
+  line-height: 1.85;
+  margin: 0 0 1.1em;
+  font-size: 1.05rem;
 }
 
 .tappable-word {
-  background: none;
-  border: none;
-  padding: 0;
+  /* เป็น span (role="button") ไม่ใช่ <button> จริง — ดูเหตุผลใน TappableText.tsx:
+     <button> ในเบราว์เซอร์ยังตัดบรรทัดใหม่ที่ขอบของมันได้แม้ตั้ง display:inline แล้ว ทำให้
+     เครื่องหมายวรรคตอนท้ายคำ (เช่น "Friday.") หลุดไปขึ้นบรรทัดใหม่เอง span ไม่มีปัญหานี้ */
+  display: inline;
+  padding: 0 1px;
   margin: 0;
   font: inherit;
   color: inherit;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.1s ease;
+  outline-offset: 2px;
 }
 
 .tappable-word:active {
   background: var(--surface-muted);
-  border-radius: 4px;
 }
 
 .sentence {
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  border-radius: 6px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: background-color 0.3s ease;
 }
 
 .sentence-active {
@@ -28,8 +35,10 @@
 }
 
 .tappable-word-target {
+  font-weight: 600;
   text-decoration: underline;
+  text-decoration-style: wavy;
   text-decoration-color: var(--accent);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 3px;
+  text-decoration-thickness: 1.4px;
+  text-underline-offset: 4px;
 }

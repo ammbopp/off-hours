@@ -88,8 +88,11 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
 
   return (
     <div className="page onboarding">
-      <h1>ยินดีต้อนรับสู่ Off Hours</h1>
-      <p className="card-label">ตั้งค่าครั้งเดียว ใช้เวลาไม่ถึง 3 นาที แล้วจะไม่ถามอีก</p>
+      <div className="onboarding-hero">
+        <div className="brand-mark" />
+        <h1>ยินดีต้อนรับสู่ Off Hours</h1>
+        <p className="card-label">ตั้งค่าครั้งเดียว ใช้เวลาไม่ถึง 3 นาที แล้วจะไม่ถามอีก</p>
+      </div>
 
       <section className="card">
         <h3>ตัวคุณ</h3>
@@ -133,7 +136,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
         <h3>หน้าตาแอป</h3>
         <label className="field">
           ขนาดตัวอักษร
-          <div className="quest-choices">
+          <div className="segmented">
             {(['sm', 'md', 'lg'] as const).map((size) => (
               <button
                 key={size}
@@ -145,9 +148,9 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
             ))}
           </div>
         </label>
-        <label className="field">
+        <label className="field" style={{ marginBottom: 0 }}>
           โหมดสี
-          <div className="quest-choices">
+          <div className="segmented">
             {(['system', 'light', 'dark'] as const).map((themeOption) => (
               <button
                 key={themeOption}

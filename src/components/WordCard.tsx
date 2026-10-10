@@ -1,3 +1,4 @@
+import { SpeakerIcon } from './icons'
 import type { ContextualTranslation, Word } from '../types'
 import './WordCard.css'
 
@@ -27,12 +28,13 @@ export function WordCard({ term, word, translation, sentence, onClose }: WordCar
   return (
     <div className="word-card-backdrop" onClick={onClose}>
       <div className="word-card" onClick={(e) => e.stopPropagation()}>
+        <span className="word-card-handle" aria-hidden />
         <div className="word-card-header">
           <strong>{term}</strong>
           <div className="word-card-actions">
             {sourceLabel && <span className="word-card-badge">{sourceLabel}</span>}
             <button className="word-card-speak" onClick={() => speak(term)} aria-label="ฟังเสียงคำ">
-              🔊
+              <SpeakerIcon size={18} />
             </button>
           </div>
         </div>
@@ -60,7 +62,7 @@ export function WordCard({ term, word, translation, sentence, onClose }: WordCar
 
         {sentence && (
           <button className="word-card-sentence" onClick={() => speak(sentence)}>
-            🔊 ฟังทั้งประโยค
+            <SpeakerIcon size={16} /> ฟังทั้งประโยค
           </button>
         )}
 

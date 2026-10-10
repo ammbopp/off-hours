@@ -57,11 +57,15 @@ export function VocabBookPage() {
 
       {searchResults ? (
         <section>
-          <h3>ผลการค้นหา ({searchResults.length})</h3>
+          <h3>
+            ผลการค้นหา
+            <span className="section-count">{searchResults.length}</span>
+          </h3>
           {searchResults.length === 0 && <p className="card-label">ไม่พบคำที่ตรงกับ "{query}"</p>}
           <ul className="vocab-list">
             {searchResults.map((w) => (
               <li key={w.id}>
+                <span className={`status-dot status-dot-${w.status}`} />
                 <strong>{w.term}</strong>{' '}
                 <span className="list-row-sub">
                   [{w.sources.join('·')}] · {STATUS_LABEL[w.status]}
@@ -86,13 +90,13 @@ export function VocabBookPage() {
             return (
               <section key={col.status}>
                 <h3>
-                  {col.label} ({items.length})
+                  <span className={`status-dot status-dot-${col.status}`} />
+                  {col.label}
+                  <span className="section-count">{items.length}</span>
                 </h3>
                 <ul className="vocab-list">
                   {shown.map((w) => (
-                    <li key={w.id}>
-                      {w.term} <span className="list-row-sub">[{w.sources.join('·')}]</span>
-                    </li>
+                    <li key={w.id}>{w.term} <span className="list-row-sub">[{w.sources.join('·')}]</span></li>
                   ))}
                 </ul>
                 {items.length > MAX_SHOWN_PER_COLUMN && (

@@ -43,15 +43,22 @@ export function QuestPage() {
     )
   }
 
+  const answeredCount = episode.quest.questions.filter((q) => answers[q.id] === q.answer).length
+
   return (
     <div className="page">
-      <h1>ภารกิจจาก {episode.title}</h1>
-      {episode.quest.questions.map((q) => {
+      <span className="eyebrow">ภารกิจท้ายตอน</span>
+      <h1>{episode.title}</h1>
+      <p className="card-label" style={{ marginBottom: 20 }}>
+        ตอบถูกแล้ว {answeredCount} / {episode.quest.questions.length} ข้อ
+      </p>
+      {episode.quest.questions.map((q, i) => {
         const picked = answers[q.id]
         const isCorrect = picked === q.answer
         return (
-          <div key={q.id} className="card">
-            <p>{q.prompt}</p>
+          <div key={q.id} className="card quest-card">
+            <div className="quest-number">{i + 1}</div>
+            <p className="quest-prompt">{q.prompt}</p>
             <div className="quest-choices">
               {q.choices?.map((choice) => (
                 <button
@@ -66,8 +73,8 @@ export function QuestPage() {
             {picked && (
               <p className={isCorrect ? 'quest-feedback quest-feedback-ok' : 'quest-feedback'}>
                 {isCorrect
-                  ? '"เยี่ยมเลย ตรงกับที่ผมคิดไว้" — Daniel พยักหน้า'
-                  : 'Daniel เอียงหัว: "ลองดูอีกทีนะ"'}
+                  ? '✓ "เยี่ยมเลย ตรงกับที่ผมคิดไว้" — Daniel พยักหน้า'
+                  : '○ Daniel เอียงหัว: "ลองดูอีกทีนะ"'}
               </p>
             )}
           </div>

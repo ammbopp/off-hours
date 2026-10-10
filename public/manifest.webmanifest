@@ -4,8 +4,8 @@
   "description": "ฝึกภาษาอังกฤษผ่านนิยาย แชท และสายโทรกับตัวละครในเรื่อง",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf7f2",
-  "theme_color": "#c3703a",
+  "background_color": "#fbf6ef",
+  "theme_color": "#e2572e",
   "icons": [
     { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]

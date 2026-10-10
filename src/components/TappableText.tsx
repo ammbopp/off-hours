@@ -30,14 +30,25 @@ export function TappableText({ paragraphs, targetTerms, activeSentenceIndex, onW
                   return <span key={cIndex}>{chunk}</span>
                 }
                 const isTarget = targetTerms?.has(chunk.toLowerCase())
+                // span ไม่ใช่ button โดยตั้งใจ: <button> ใน Chrome/Safari ยังคงพฤติกรรม "กล่อง atomic"
+                // ที่ยอมให้ตัดขึ้นบรรทัดใหม่ได้ที่ขอบของมันแม้ตั้ง display:inline + appearance:none แล้วก็ตาม
+                // (ปัญหานี้ทำให้เครื่องหมายวรรคตอนท้ายคำ เช่น "Friday." หลุดไปขึ้นบรรทัดใหม่เอง)
+                // span + role="button" ให้ผลลัพธ์แบบ inline จริงๆ โดยยังกด Enter/Space ได้เหมือน button
                 return (
-                  <button
+                  <span
                     key={cIndex}
+                    role="button"
+                    tabIndex={0}
                     className={isTarget ? 'tappable-word tappable-word-target' : 'tappable-word'}
                     onClick={() => onWordTap(chunk, sentence)}
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Enter' && e.key !== ' ') return
+                      e.preventDefault()
+                      onWordTap(chunk, sentence)
+                    }}
                   >
                     {chunk}
-                  </button>
+                  </span>
                 )
               })}{' '}
             </span>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
+import { PauseIcon, PlayIcon } from '../components/icons'
 import { getAllEpisodes, getAllWords, getProgress, putWord, updateProgress } from '../lib/db'
 import { recordEncounter } from '../lib/srs'
 import { makeBlankWord } from '../lib/wordlists/import'
@@ -166,7 +167,8 @@ export function ReadPage() {
         {narration.supported ? (
           <>
             <button className="button" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))}>
-              {playing ? '⏸ หยุดเสียง' : '▶︎ ฟังเสียงบรรยาย'}
+              {playing ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
+              {playing ? 'หยุดเสียง' : 'ฟังเสียงบรรยาย'}
             </button>
             <div className="reader-rates">
               {RATES.map((r) => (

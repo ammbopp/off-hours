@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getSettings, putSettings } from '../lib/db'
 import { applyPreferences } from '../lib/theme'
+import { ChevronRightIcon, VocabIcon } from '../components/icons'
 import { DEFAULT_SETTINGS, type FontSize, type Settings, type StoryGenre, type ThemePreference } from '../types'
 
 const GENRES: { value: StoryGenre; label: string }[] = [
@@ -62,7 +63,7 @@ export function SettingsPage() {
         <h3>หน้าตาแอป</h3>
         <label className="field">
           ขนาดตัวอักษร
-          <div className="quest-choices">
+          <div className="segmented">
             {FONT_SIZES.map((f) => (
               <button
                 key={f.value}
@@ -74,9 +75,9 @@ export function SettingsPage() {
             ))}
           </div>
         </label>
-        <label className="field">
+        <label className="field" style={{ marginBottom: 0 }}>
           โหมดสี
-          <div className="quest-choices">
+          <div className="segmented">
             {THEMES.map((t) => (
               <button
                 key={t.value}
@@ -90,64 +91,74 @@ export function SettingsPage() {
         </label>
       </section>
 
-      <label className="field">
-        ระดับภาษา
-        <input
-          value={settings.level}
-          onChange={(e) => setSettings({ ...settings, level: e.target.value })}
-          placeholder="เช่น กลาง, B1, เทียบ TOEIC 600"
-        />
-      </label>
+      <section className="card">
+        <h3>โปรไฟล์</h3>
+        <label className="field">
+          ระดับภาษา
+          <input
+            value={settings.level}
+            onChange={(e) => setSettings({ ...settings, level: e.target.value })}
+            placeholder="เช่น กลาง, B1, เทียบ TOEIC 600"
+          />
+        </label>
 
-      <label className="field">
-        เป้าคะแนน TOEIC
-        <input
-          type="number"
-          value={settings.toeicGoal ?? ''}
-          onChange={(e) => setSettings({ ...settings, toeicGoal: e.target.value ? Number(e.target.value) : null })}
-        />
-      </label>
+        <label className="field">
+          เป้าคะแนน TOEIC
+          <input
+            type="number"
+            value={settings.toeicGoal ?? ''}
+            onChange={(e) => setSettings({ ...settings, toeicGoal: e.target.value ? Number(e.target.value) : null })}
+          />
+        </label>
 
-      <label className="field">
-        สายงาน
-        <input
-          value={settings.industry}
-          onChange={(e) => setSettings({ ...settings, industry: e.target.value })}
-          placeholder="เช่น ที่ปรึกษาธุรกิจ, การตลาด"
-        />
-      </label>
+        <label className="field">
+          สายงาน
+          <input
+            value={settings.industry}
+            onChange={(e) => setSettings({ ...settings, industry: e.target.value })}
+            placeholder="เช่น ที่ปรึกษาธุรกิจ, การตลาด"
+          />
+        </label>
 
-      <label className="field">
-        แนวเรื่องที่ชอบ
-        <select
-          value={settings.genre}
-          onChange={(e) => setSettings({ ...settings, genre: e.target.value as StoryGenre })}
-        >
-          {GENRES.map((g) => (
-            <option key={g.value} value={g.value}>
-              {g.label}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="field">
+          แนวเรื่องที่ชอบ
+          <select
+            value={settings.genre}
+            onChange={(e) => setSettings({ ...settings, genre: e.target.value as StoryGenre })}
+          >
+            {GENRES.map((g) => (
+              <option key={g.value} value={g.value}>
+                {g.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <label className="field">
-        งบ API ต่อเดือน (USD)
-        <input
-          type="number"
-          value={settings.monthlyBudgetUsd}
-          onChange={(e) => setSettings({ ...settings, monthlyBudgetUsd: Number(e.target.value) })}
-        />
-      </label>
+        <label className="field" style={{ marginBottom: 0 }}>
+          งบ API ต่อเดือน (USD)
+          <input
+            type="number"
+            value={settings.monthlyBudgetUsd}
+            onChange={(e) => setSettings({ ...settings, monthlyBudgetUsd: Number(e.target.value) })}
+          />
+        </label>
+      </section>
 
-      <button className="button" onClick={save}>
+      <button className="button" onClick={save} style={{ width: '100%' }}>
         บันทึก
       </button>
-      {saved && <p className="card-label">บันทึกแล้ว</p>}
+      {saved && <p className="card-label" style={{ textAlign: 'center', marginTop: 8 }}>บันทึกแล้ว</p>}
 
+      <h3 style={{ marginTop: 28 }}>คำศัพท์</h3>
       <Link to="/onboarding" className="list-row">
-        <strong>ประเมินคำศัพท์อีกครั้ง</strong>
-        <span className="list-row-sub">เลือกคำที่รู้แล้วจากตัวอย่างใหม่ เพื่อข้ามคำเหล่านั้นจากรอบทวน</span>
+        <span className="avatar avatar-sm" aria-hidden>
+          <VocabIcon size={16} />
+        </span>
+        <span className="list-row-text">
+          <strong>ประเมินคำศัพท์อีกครั้ง</strong>
+          <span className="list-row-sub">เลือกคำที่รู้แล้วจากตัวอย่างใหม่ เพื่อข้ามคำเหล่านั้นจากรอบทวน</span>
+        </span>
+        <ChevronRightIcon size={18} className="list-row-chevron" />
       </Link>
     </div>
   )
