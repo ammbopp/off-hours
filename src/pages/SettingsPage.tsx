@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getSettings, putSettings } from '../lib/db'
-import { DEFAULT_SETTINGS, type Settings, type StoryGenre } from '../types'
+import { applyPreferences } from '../lib/theme'
+import { DEFAULT_SETTINGS, type FontSize, type Settings, type StoryGenre, type ThemePreference } from '../types'
 
 const GENRES: { value: StoryGenre; label: string }[] = [
   { value: 'office-drama', label: 'ดราม่าที่ทำงาน' },
@@ -8,12 +10,30 @@ const GENRES: { value: StoryGenre; label: string }[] = [
   { value: 'mystery', label: 'สืบสวน' },
 ]
 
+const FONT_SIZES: { value: FontSize; label: string }[] = [
+  { value: 'sm', label: 'เล็ก' },
+  { value: 'md', label: 'กลาง' },
+  { value: 'lg', label: 'ใหญ่' },
+]
+
+const THEMES: { value: ThemePreference; label: string }[] = [
+  { value: 'system', label: 'ตามระบบ' },
+  { value: 'light', label: 'สว่าง' },
+  { value: 'dark', label: 'มืด' },
+]
+
 export function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
   const [saved, setSaved] = useState(false)
+  const loadedRef = useRef(false)
+  const settingsRef = useRef(settings)
+  settingsRef.current = settings
 
   useEffect(() => {
-    getSettings().then((s) => s && setSettings(s))
+    getSettings().then((s) => {
+      if (s) setSettings(s)
+      loadedRef.current = true
+    })
   }, [])
 
   async function save() {
@@ -22,9 +42,53 @@ export function SettingsPage() {
     window.setTimeout(() => setSaved(false), 1500)
   }
 
+  // หน้าตาแอป (ขนาดตัวอักษร/โหมดสี) ใช้ผลทันทีและบันทึกทันที ไม่ต้องรอกดปุ่มบันทึก ต่างจากฟิลด์โปรไฟล์ด้านล่าง
+  // ใช้ effect แยกจาก onClick (แทนการคำนวณ next = {...settings, ...} ในตัว handler ตรงๆ) เพราะถ้าผู้ใช้
+  // กดสองปุ่มติดกันเร็วๆ React อาจรวมเป็น batch เดียว ทำให้ handler ตัวที่สองยังอ่าน settings ค่าเก่า
+  // แล้วเขียนทับค่าที่ตัวแรกเพิ่งตั้งไว้ — settingsRef ใช้อ่านค่าล่าสุดตอนบันทึกโดยไม่ทำให้ effect นี้
+  // ยิงซ้ำทุกครั้งที่ฟิลด์อื่น (เช่น ระดับภาษา) เปลี่ยน เพราะ deps มีแค่ theme/fontSize
+  const { theme, fontSize } = settings
+  useEffect(() => {
+    if (!loadedRef.current) return
+    applyPreferences({ theme, fontSize })
+    void putSettings(settingsRef.current)
+  }, [theme, fontSize])
+
   return (
     <div className="page">
       <h1>ตั้งค่า</h1>
+
+      <section className="card">
+        <h3>หน้าตาแอป</h3>
+        <label className="field">
+          ขนาดตัวอักษร
+          <div className="quest-choices">
+            {FONT_SIZES.map((f) => (
+              <button
+                key={f.value}
+                className={settings.fontSize === f.value ? 'button button-selected' : 'button button-outline'}
+                onClick={() => setSettings((prev) => ({ ...prev, fontSize: f.value }))}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </label>
+        <label className="field">
+          โหมดสี
+          <div className="quest-choices">
+            {THEMES.map((t) => (
+              <button
+                key={t.value}
+                className={settings.theme === t.value ? 'button button-selected' : 'button button-outline'}
+                onClick={() => setSettings((prev) => ({ ...prev, theme: t.value }))}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </label>
+      </section>
 
       <label className="field">
         ระดับภาษา
@@ -80,6 +144,11 @@ export function SettingsPage() {
         บันทึก
       </button>
       {saved && <p className="card-label">บันทึกแล้ว</p>}
+
+      <Link to="/onboarding" className="list-row">
+        <strong>ประเมินคำศัพท์อีกครั้ง</strong>
+        <span className="list-row-sub">เลือกคำที่รู้แล้วจากตัวอย่างใหม่ เพื่อข้ามคำเหล่านั้นจากรอบทวน</span>
+      </Link>
     </div>
   )
 }

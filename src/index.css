@@ -9,8 +9,9 @@
   --highlight: #f6e3c9;
 }
 
+/* โหมดมืดตามระบบ — ใช้เมื่อผู้ใช้ไม่ได้เลือกไว้ชัดเจนใน settings (theme: 'system') */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #17140f;
     --surface: #221e18;
     --surface-muted: #2c271f;
@@ -20,6 +21,30 @@
     --accent: #e08f52;
     --highlight: #40321f;
   }
+}
+
+/* ผู้ใช้เลือกโหมดมืดเองใน settings ไม่ว่าระบบจะตั้งไว้เป็นโหมดไหน */
+:root[data-theme='dark'] {
+  --bg: #17140f;
+  --surface: #221e18;
+  --surface-muted: #2c271f;
+  --text: #f3efe8;
+  --text-muted: #a69c8d;
+  --border: #3a332a;
+  --accent: #e08f52;
+  --highlight: #40321f;
+}
+
+/* ขนาดตัวอักษร — ปรับที่ <html> ค่าเดียว ทุกจุดที่ใช้หน่วย rem จะขยับตาม */
+html[data-font-size='sm'] {
+  font-size: 15px;
+}
+html,
+html[data-font-size='md'] {
+  font-size: 17px;
+}
+html[data-font-size='lg'] {
+  font-size: 20px;
 }
 
 * {
@@ -102,6 +127,18 @@ button {
 .list-row-sub {
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+.generate-next {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.generate-error {
+  color: var(--accent);
+  margin-top: 6px;
 }
 
 .stats-row {
@@ -231,6 +268,22 @@ button {
   text-align: center;
 }
 
+.vocab-search {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.vocab-definition {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 2px 0 0;
+}
+
 .vocab-list {
   list-style: none;
   padding: 0;
@@ -281,6 +334,25 @@ button {
   display: flex;
   gap: 8px;
   margin-top: 16px;
+}
+
+.onboarding {
+  padding-bottom: 100px;
+}
+
+.onboarding-submit {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 14px;
+  font-size: 1.05rem;
+}
+
+.calibration-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .chat-input-row input {

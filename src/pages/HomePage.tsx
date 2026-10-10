@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllEpisodes, getAllProgress, getAllWords, getMessagesForCharacter } from '../lib/db'
+import { getAllEpisodes, getAllProgress, getAllWords, getMessagesForCharacter, putEpisode } from '../lib/db'
+import { pickTargetWords } from '../lib/srs'
+import { generateEpisode } from '../features/story/generateEpisode'
 import { characters } from '../features/chat/characters'
 import type { Episode, Message, ReadingProgress, Word } from '../types'
 
@@ -9,6 +11,8 @@ export function HomePage() {
   const [words, setWords] = useState<Word[]>([])
   const [progress, setProgress] = useState<ReadingProgress[]>([])
   const [previews, setPreviews] = useState<Record<string, Message | undefined>>({})
+  const [generating, setGenerating] = useState(false)
+  const [generateError, setGenerateError] = useState<string | null>(null)
 
   useEffect(() => {
     getAllEpisodes().then(setEpisodes)
@@ -23,6 +27,28 @@ export function HomePage() {
   }, [])
 
   const masteredCount = words.filter((w) => w.status === 'mastered').length
+
+  // TODO: ตอนนี้ยังเรียกไม่สำเร็จจนกว่าจะต่อผู้ให้บริการ AI จริง (ดู server/llm/generate-episode.ts)
+  // ปุ่มนี้ต่อ pipeline ไว้ครบแล้ว (เลือกคำเป้าหมาย → เรียกสร้างตอน → บันทึก) รอแค่ปลายทางเท่านั้น
+  async function handleGenerateNext() {
+    setGenerating(true)
+    setGenerateError(null)
+    try {
+      const targetWords = pickTargetWords(words, 10)
+      const lastEpisode = episodes.at(-1)
+      const newEpisode = await generateEpisode({
+        episodeOrder: (lastEpisode?.order ?? 0) + 1,
+        previousSummary: lastEpisode?.summary ?? null,
+        targetWords,
+      })
+      await putEpisode(newEpisode)
+      setEpisodes((prev) => [...prev, newEpisode])
+    } catch (err) {
+      setGenerateError(err instanceof Error ? err.message : 'สร้างตอนใหม่ไม่สำเร็จ')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   return (
     <div className="page">
@@ -47,6 +73,15 @@ export function HomePage() {
             </Link>
           )
         })}
+
+        <button
+          className="button button-outline generate-next"
+          onClick={handleGenerateNext}
+          disabled={generating || words.length === 0}
+        >
+          {generating ? 'กำลังสร้างตอนใหม่...' : '+ สร้างตอนต่อไป'}
+        </button>
+        {generateError && <p className="card-label generate-error">{generateError}</p>}
       </section>
 
       <section>
