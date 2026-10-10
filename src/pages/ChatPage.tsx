@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
@@ -44,7 +44,13 @@ function ChatThread({ characterId }: { characterId: string }) {
   const [draft, setDraft] = useState('')
   const [selected, setSelected] = useState<{ term: string; word?: Word; sentence: string } | null>(null)
 
+  // ติดตาม characterId ปัจจุบันด้วย ref เพราะ ChatThread ไม่ unmount เมื่อสลับคู่สนทนาโดยตรง
+  // (React ใช้ instance เดิมซ้ำ แค่เปลี่ยน prop) — ถ้าไม่เช็กตรงนี้ คำตอบจำลองที่ค้างอยู่ใน setTimeout
+  // ของคู่สนทนาเก่าจะหลุดไปโผล่ในหน้าต่างแชทของคู่สนทนาใหม่ที่เพิ่งสลับไปดู
+  const characterIdRef = useRef(characterId)
+
   useEffect(() => {
+    characterIdRef.current = characterId
     getMessagesForCharacter(characterId).then(setMessages)
     getAllWords().then(setWords)
   }, [characterId])
@@ -74,7 +80,10 @@ function ChatThread({ characterId }: { characterId: string }) {
         createdAt: new Date().toISOString(),
       }
       await putMessage(placeholderReply)
-      setMessages((prev) => [...prev, placeholderReply])
+      // ยังบันทึกลง DB ให้คู่สนทนาเดิมตามปกติ แต่ไม่อัปเดตข้อความที่ "กำลังแสดงอยู่" ถ้าผู้ใช้สลับไปคุยกับคนอื่นแล้ว
+      if (characterIdRef.current === characterId) {
+        setMessages((prev) => [...prev, placeholderReply])
+      }
     }, 600)
   }
 

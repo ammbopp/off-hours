@@ -65,18 +65,26 @@ export function ReadPage() {
   const { activeIndex, playing, rate, setRate, speakFrom, stop } = narration
 
   // โหลดตำแหน่งที่อ่านค้างไว้ของตอนนี้
+  // มี cancelled guard เพราะกด "ตอนต่อไป" ซ้ำเร็วๆ ได้ (คลิกเดียวก็ไปตอนถัดไปทันที คอมโพเนนต์ไม่ unmount
+  // แค่เปลี่ยน episode) ถ้าตอนก่อนหน้ายัง getProgress ไม่เสร็จตอนสลับไปตอนใหม่ ผลที่เสร็จช้าจะมาเขียนทับ
+  // resumeIndex/finished ของตอนใหม่ที่กำลังดูอยู่ด้วยข้อมูลของตอนเก่า
   useEffect(() => {
     if (!episode) return
+    let cancelled = false
     furthestSentenceRef.current = 0
     setResumeIndex(null)
     setFinished(false)
 
     getProgress(episode.id).then((progress) => {
-      if (!progress) return
+      if (cancelled || !progress) return
       furthestSentenceRef.current = progress.lastSentenceIndex
       setFinished(Boolean(progress.finishedAt))
       if (progress.lastSentenceIndex > 0) setResumeIndex(progress.lastSentenceIndex)
     })
+
+    return () => {
+      cancelled = true
+    }
   }, [episode])
 
   // หยุดเสียงเมื่อเปลี่ยนตอน
@@ -120,6 +128,12 @@ export function ReadPage() {
 
   async function handleWordTap(term: string, sentence: ParsedSentence) {
     if (!episode) return
+
+    // หยุดเสียงบรรยายก่อนเปิดการ์ดคำ — WordCard มีปุ่มฟังเสียงของตัวเองที่เรียก speechSynthesis.cancel()
+    // ตรงๆ ถ้าเสียงบรรยายกำลังเล่นอยู่ จะไปแย่งเล่นพร้อมกัน และพฤติกรรมหลัง cancel() ก็ไม่แน่นอนข้ามเบราว์เซอร์
+    // (บางตัวยิง 'onend' แทน 'onerror' ทำให้ตัวอ่านของเราเข้าใจผิดว่าประโยคจบแล้วแล้วเล่นประโยคถัดไปต่อทันที
+    // ซ้อนกับเสียงจากการ์ดคำ) เรียก stop() ของเราเองไว้ก่อนให้ผลลัพธ์แน่นอนไม่ว่าเบราว์เซอร์จะส่ง event แบบไหน
+    if (playing) stop()
 
     const found = lookupWord(wordIndex, term)
     const word = found ?? makeBlankWord(term, ['custom'])

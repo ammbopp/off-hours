@@ -116,19 +116,28 @@ export async function getAllProgress(): Promise<ReadingProgress[]> {
 // อัปเดตแบบรวมกับของเดิมเสมอ ไม่เขียนทับทั้งก้อน เพราะมีสองจุดที่เขียนความคืบหน้าพร้อมกันได้
 // (การเลื่อนจอ/เสียงบรรยาย เขียน lastSentenceIndex ส่วนปุ่ม "อ่านจบตอนนี้" เขียน finishedAt)
 // และ lastSentenceIndex เดินหน้าอย่างเดียว กันไม่ให้ค่าถอยหลังเมื่อผู้ใช้เลื่อนกลับขึ้นไป
+//
+// get กับ put ต้องอยู่ใน transaction เดียวกัน (ไม่ใช่เรียก db.get แล้วค่อย db.put แยกกัน) เพราะถ้าแยกกัน
+// สอง transaction อัตโนมัติตรงกลางมีช่องให้ updateProgress อีกคอลที่ทำงานคาบเกี่ยวกันแทรกเข้ามาได้
+// (เช่น IntersectionObserver เซฟตำแหน่งตอนเลื่อนจอ ชนกับตอนกดปุ่ม "อ่านจบตอนนี้" พอดี) ทำให้ get ของทั้งคู่
+// เห็นค่าเดิมก่อนอีกฝั่งจะเขียน แล้ว put ทีหลังทับค่าที่อีกฝั่งเพิ่งเขียนไปจนข้อมูลหาย (เช่น finishedAt หลุด)
+// รวมเป็น transaction เดียวทำให้ IndexedDB serialize การอ่าน+เขียนของแต่ละคอลให้อะตอมมิกจริง
 export async function updateProgress(
   episodeId: string,
   patch: { lastSentenceIndex?: number; finishedAt?: string },
 ): Promise<void> {
   const db = await getDB()
-  const existing = await db.get('progress', episodeId)
+  const tx = db.transaction('progress', 'readwrite')
+  const store = tx.objectStore('progress')
+  const existing = await store.get(episodeId)
 
-  await db.put('progress', {
+  await store.put({
     episodeId,
     lastSentenceIndex: Math.max(existing?.lastSentenceIndex ?? 0, patch.lastSentenceIndex ?? 0),
     finishedAt: patch.finishedAt ?? existing?.finishedAt ?? null,
     updatedAt: new Date().toISOString(),
   })
+  await tx.done
 }
 
 export async function getSettings(): Promise<Settings | undefined> {
