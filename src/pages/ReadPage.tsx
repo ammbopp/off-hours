@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
 import { getAllEpisodes, getAllWords, putWord } from '../lib/db'
@@ -12,14 +13,19 @@ interface SelectedWord {
 }
 
 export function ReadPage() {
-  const [episode, setEpisode] = useState<Episode | null>(null)
+  const { episodeId } = useParams<{ episodeId?: string }>()
+  const [episodes, setEpisodes] = useState<Episode[]>([])
   const [words, setWords] = useState<Word[]>([])
   const [selected, setSelected] = useState<SelectedWord | null>(null)
 
   useEffect(() => {
-    getAllEpisodes().then((episodes) => setEpisode(episodes.at(-1) ?? null))
+    getAllEpisodes().then(setEpisodes)
     getAllWords().then(setWords)
   }, [])
+
+  const index = episodeId ? episodes.findIndex((e) => e.id === episodeId) : 0
+  const episode = episodes[index === -1 ? 0 : index] ?? null
+  const nextEpisode = episode ? episodes[episodes.findIndex((e) => e.id === episode.id) + 1] : undefined
 
   const targetTerms = useMemo(() => {
     if (!episode) return new Set<string>()
@@ -55,7 +61,7 @@ export function ReadPage() {
   if (!episode) {
     return (
       <div className="page">
-        <p>ยังไม่มีตอนให้อ่าน — เพิ่มข้อมูลตัวอย่างหรือรอ features/story/generateEpisode</p>
+        <p>ยังไม่มีตอนให้อ่าน — รอ npm run wordlists:import และ features/story/generateEpisode</p>
       </div>
     )
   }
@@ -64,6 +70,18 @@ export function ReadPage() {
     <div className="page">
       <h1>{episode.title}</h1>
       <TappableText text={episode.content} targetTerms={targetTerms} onWordTap={handleWordTap} />
+
+      <div className="read-footer">
+        <Link className="button" to={`/quest/${episode.id}`}>
+          ทำภารกิจท้ายตอน
+        </Link>
+        {nextEpisode && (
+          <Link className="button button-outline" to={`/read/${nextEpisode.id}`}>
+            ตอนต่อไป: {nextEpisode.title}
+          </Link>
+        )}
+      </div>
+
       {selected && (
         <WordCard term={selected.term} translation={selected.translation} onClose={() => setSelected(null)} />
       )}

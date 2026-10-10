@@ -16,7 +16,9 @@ export function validateEpisode(params: {
   knownVocabulary: Set<string>
 }): ValidationResult {
   const issues: ValidationIssue[] = []
-  const words: string[] = params.content.toLowerCase().match(/[a-z']+/g) ?? []
+  // แยกที่เครื่องหมายอะพอสโทรฟีด้วย เพราะคลังคำ NGSL/TSL/BSL เก็บรูปย่อของคำปฏิเสธ/กริยาช่วยแบบแยกคำ
+  // (เช่น don't → "don" + "t", I'm → "i" + "m") ถ้าเก็บอะพอสโทรฟีไว้ในคำ คำเหล่านี้จะไม่ตรงกับคลังเลย
+  const words: string[] = params.content.toLowerCase().match(/[a-z]+/g) ?? []
 
   for (const term of params.targetTerms) {
     if (!words.includes(term.toLowerCase())) {

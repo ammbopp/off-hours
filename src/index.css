@@ -176,6 +176,17 @@ button {
   color: var(--text);
 }
 
+.read-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.read-footer .button {
+  text-align: center;
+}
+
 .vocab-list {
   list-style: none;
   padding: 0;

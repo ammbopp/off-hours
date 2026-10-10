@@ -30,13 +30,15 @@ export function recordEncounter(word: Word, encounter: WordEncounter): Word {
   }
 }
 
-// เลือกคำเป้าหมาย 8–12 คำสำหรับตอนถัดไป: คำใหม่ตามระดับ + คำที่ถึงรอบทวนก่อน
+// เลือกคำเป้าหมาย 8–12 คำสำหรับตอนถัดไป: คำที่ถึงรอบทวนก่อน แล้วเติมด้วยคำใหม่
+// เฉพาะ TSL/BSL เท่านั้น เพราะ NGSL เป็นฐาน "คำที่ถือว่ารู้แล้ว" ไว้คุมระดับภาษา ไม่ใช่คำที่ต้องสอน (ดู README)
 export function pickTargetWords(allWords: Word[], count = 10): Word[] {
+  const targetable = allWords.filter((w) => w.source === 'TSL' || w.source === 'BSL')
   const now = new Date().toISOString()
-  const due = allWords
+  const due = targetable
     .filter((w) => w.nextReviewAt !== null && w.nextReviewAt <= now)
     .sort((a, b) => (a.nextReviewAt ?? '').localeCompare(b.nextReviewAt ?? ''))
-  const fresh = allWords.filter((w) => w.status === 'new')
+  const fresh = targetable.filter((w) => w.status === 'new')
 
   return [...due, ...fresh].slice(0, count)
 }

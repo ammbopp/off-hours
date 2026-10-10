@@ -1,6 +1,6 @@
 import type { Word, WordSource } from '../../types'
 
-function makeWordId(source: WordSource, term: string): string {
+export function makeWordId(source: WordSource, term: string): string {
   return `${source}:${term.toLowerCase()}`
 }
 
@@ -16,12 +16,42 @@ export function makeBlankWord(term: string, source: WordSource): Word {
   }
 }
 
-// TODO: ปรับตามคอลัมน์จริงของไฟล์ที่ดาวน์โหลดมา (ดู data/wordlists/README.md)
-// สมมติไว้ก่อนว่าแต่ละบรรทัดคือหนึ่งคำ ไม่มีหัวตาราง
-export function parseWordListCsv(csvText: string, source: WordSource): Word[] {
-  return csvText
-    .split(/\r?\n/)
-    .map((line) => line.split(',')[0]?.trim())
-    .filter((term): term is string => Boolean(term))
-    .map((term) => makeBlankWord(term, source))
+export interface ParsedWordList {
+  words: Word[] // หนึ่งรายการต่อหนึ่งคำตั้งต้น (lemma/headword) — ใช้เป็นคำในคลังศัพท์ที่ติดตามสถานะ
+  formsByTerm: Record<string, string[]> // headword (ตัวพิมพ์เล็ก) → รูปแปรทั้งหมดบนบรรทัดเดียวกัน (รวม headword เอง)
+}
+
+// รูปแบบไฟล์จริงจาก NGSL Project (ไฟล์ "lemmatized for teaching" — ดู data/wordlists/README.md):
+// บรรทัดขึ้นต้นด้วย ## คือคอมเมนต์ ไม่มีหัวตาราง แต่ละบรรทัดข้อมูลคือ "คำตั้งต้น,รูปแปร1,รูปแปร2,..."
+// เช่น "do,does,don,doesn,did,didn,doing,done,doin" — ตั้งใจแยกรูปย่อของคำปฏิเสธ/กริยาช่วยไว้ด้วย
+// (เทียบ src/features/story/validateEpisode.ts ที่แยกคำที่เครื่องหมายอะพอสโทรฟี เพื่อให้ "don't" จับคู่กับ "don" + "t" ได้)
+export function parseWordListCsv(csvText: string, source: WordSource): ParsedWordList {
+  const words: Word[] = []
+  const formsByTerm: Record<string, string[]> = {}
+
+  for (const rawLine of csvText.split(/\r?\n/)) {
+    const line = rawLine.trim()
+    if (!line || line.startsWith('##')) continue
+
+    const forms = line
+      .split(',')
+      .map((f) => f.trim().toLowerCase())
+      .filter(Boolean)
+    const headword = forms[0]
+    if (!headword) continue
+
+    words.push(makeBlankWord(headword, source))
+    formsByTerm[headword] = forms
+  }
+
+  return { words, formsByTerm }
+}
+
+// รวมรูปแปรทั้งหมดของทุกคำในคลังเป็นชุดเดียว ใช้เป็นฐาน "คำที่รู้แล้ว" (knownVocabulary) ของ validateEpisode
+export function collectAllForms(parsed: ParsedWordList): Set<string> {
+  const all = new Set<string>()
+  for (const forms of Object.values(parsed.formsByTerm)) {
+    for (const f of forms) all.add(f)
+  }
+  return all
 }

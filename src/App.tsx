@@ -10,7 +10,9 @@ import { CallPage } from './pages/CallPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { putMessage, seedIfEmpty } from './lib/db'
 import { characters } from './features/chat/characters'
-import { sampleEpisode, sampleMessages, sampleWords } from './data/sample'
+import { sampleMessages } from './data/sample'
+import { episodes } from './data/episodes'
+import type { Word } from './types'
 
 function App() {
   // รอใส่ข้อมูลตัวอย่าง/เปิด DB ให้เสร็จก่อนเรนเดอร์หน้าที่ต้องอ่านข้อมูล
@@ -18,7 +20,11 @@ function App() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    seedIfEmpty({ words: sampleWords, characters, episodes: [sampleEpisode] })
+    // คลังคำจริง (NGSL/TSL/BSL ~5,800 คำ) ถูก fetch จากไฟล์สถิตแทนการ bundle เข้า JS
+    // เพราะไฟล์ใหญ่ ~1MB — ดู scripts/import-wordlists.ts
+    fetch('/words.generated.json')
+      .then((res) => res.json() as Promise<Word[]>)
+      .then((words) => seedIfEmpty({ words, characters, episodes }))
       .then(async (didSeed) => {
         if (!didSeed) return
         for (const message of sampleMessages) {
@@ -38,9 +44,11 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/read" element={<ReadPage />} />
+          <Route path="/read/:episodeId" element={<ReadPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:characterId" element={<ChatPage />} />
           <Route path="/quest" element={<QuestPage />} />
+          <Route path="/quest/:episodeId" element={<QuestPage />} />
           <Route path="/vocab" element={<VocabBookPage />} />
           <Route path="/call" element={<CallPage />} />
           <Route path="/settings" element={<SettingsPage />} />

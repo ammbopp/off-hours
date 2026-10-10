@@ -20,25 +20,21 @@ export function HomePage() {
     ).then((pairs) => setPreviews(Object.fromEntries(pairs)))
   }, [])
 
-  const latestEpisode = episodes.at(-1)
   const masteredCount = words.filter((w) => w.status === 'mastered').length
 
   return (
     <div className="page">
       <h1>Off Hours</h1>
 
-      <section className="card">
-        {latestEpisode ? (
-          <>
-            <p className="card-label">ตอนล่าสุด</p>
-            <h2>{latestEpisode.title}</h2>
-            <Link className="button" to="/read">
-              อ่านตอนนี้
-            </Link>
-          </>
-        ) : (
-          <p>ยังไม่มีตอน — ต่อ features/story/generateEpisode เพื่อสร้างตอนแรก</p>
-        )}
+      <section>
+        <h3>ตอนทั้งหมด</h3>
+        {episodes.length === 0 && <p>ยังไม่มีตอน — ต่อ features/story/generateEpisode เพื่อสร้างตอนแรก</p>}
+        {episodes.map((ep) => (
+          <Link key={ep.id} to={`/read/${ep.id}`} className="list-row">
+            <strong>{ep.title}</strong>
+            <span className="list-row-sub">คำเป้าหมาย {ep.targetWordIds.length} คำ</span>
+          </Link>
+        ))}
       </section>
 
       <section>

@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { getAllEpisodes, getAllWords, putWord } from '../lib/db'
 import { recordEncounter } from '../lib/srs'
 import type { Episode, QuestQuestion, Word } from '../types'
 
 export function QuestPage() {
-  const [episode, setEpisode] = useState<Episode | null>(null)
+  const { episodeId } = useParams<{ episodeId?: string }>()
+  const [episodes, setEpisodes] = useState<Episode[]>([])
   const [words, setWords] = useState<Word[]>([])
   const [answers, setAnswers] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    getAllEpisodes().then((episodes) => setEpisode(episodes.at(-1) ?? null))
+    getAllEpisodes().then(setEpisodes)
     getAllWords().then(setWords)
   }, [])
+
+  const episode = (episodeId ? episodes.find((e) => e.id === episodeId) : episodes[0]) ?? null
 
   async function choose(question: QuestQuestion, choice: string) {
     setAnswers((prev) => ({ ...prev, [question.id]: choice }))
