@@ -162,14 +162,16 @@ a {
   animation: page-in 0.35s ease both;
 }
 
+/* ห้ามใส่ transform ใน keyframes นี้: .page ครอบ WordCard (position:fixed) ไว้เป็นลูกใน DOM
+   ถ้า .page มี transform ค้างอยู่ (แม้ค่าจะเป็น translateY(0) ก็ตาม) มันจะกลายเป็น containing block
+   ของลูกที่ position:fixed ตามสเปก CSS Transforms ทำให้การ์ดคำศัพท์ไปยึดตำแหน่งกับ .page แทนวิวพอร์ต
+   เคยเกิดบั๊กจริง: การ์ดเด้งไปอยู่ล่างสุดของ "หน้า" (เนื้อหายาวแค่ไหนก็ลงไปสุดตรงนั้น) แทนที่จะลอยล่างจอ */
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
