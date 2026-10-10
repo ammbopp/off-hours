@@ -1,0 +1,63 @@
+.word-card-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+}
+
+.word-card {
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.word-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.word-card-speak {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.word-card-translation {
+  font-size: 1rem;
+  margin: 4px 0;
+}
+
+.word-card-pos {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.word-card-example {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.word-card-unknown {
+  color: var(--text-muted);
+}
+
+.word-card-close {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--text);
+}
