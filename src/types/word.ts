@@ -16,9 +16,14 @@ export interface WordEncounter {
 }
 
 export interface Word {
-  id: string
+  id: string // = ตัวคำตัวพิมพ์เล็ก — หนึ่งคำมีรายการเดียวเสมอ แม้จะอยู่หลายคลัง (TSL กับ BSL ซ้ำกัน 575 คำ)
   term: string
-  source: WordSource
+  // คลังที่คำนี้อยู่ คำเดียวกันอยู่ได้หลายคลัง จึงเก็บเป็นรายการ ไม่ใช่ค่าเดียว
+  sources: WordSource[]
+  // รูปแปรทั้งหมดของคำนี้ (รวมตัวคำเอง) ใช้จับคู่คำที่ผันรูปในเนื้อเรื่อง เช่น "approving" → "approve"
+  forms: string[]
+  // คำนิยามภาษาอังกฤษแบบง่ายจากคลังต้นทาง มีเฉพาะ NGSL กับ TSL (BSL ไม่มีไฟล์คำนิยาม)
+  definition?: string
   status: WordStatus
   nextReviewAt: string | null // ISO date, null = ยังไม่เข้าตารางทวน
   encounters: WordEncounter[]

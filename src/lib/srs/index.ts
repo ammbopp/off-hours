@@ -1,4 +1,5 @@
 import type { Word, WordEncounter, WordStatus } from '../../types'
+import { isTargetable } from '../wordlists/import'
 
 // รอบทวนแบบย่อ (fixed-interval) ไว้ใช้ก่อน — ตามแผนให้เปลี่ยนเป็นอัลกอริทึม FSRS จริง
 // (เช่นไลบรารี ts-fsrs) เมื่อมีข้อมูลการทวนมากพอให้ปรับพารามิเตอร์ ดู README หัวข้อ "ระบบคำศัพท์เบื้องหลัง"
@@ -33,7 +34,7 @@ export function recordEncounter(word: Word, encounter: WordEncounter): Word {
 // เลือกคำเป้าหมาย 8–12 คำสำหรับตอนถัดไป: คำที่ถึงรอบทวนก่อน แล้วเติมด้วยคำใหม่
 // เฉพาะ TSL/BSL เท่านั้น เพราะ NGSL เป็นฐาน "คำที่ถือว่ารู้แล้ว" ไว้คุมระดับภาษา ไม่ใช่คำที่ต้องสอน (ดู README)
 export function pickTargetWords(allWords: Word[], count = 10): Word[] {
-  const targetable = allWords.filter((w) => w.source === 'TSL' || w.source === 'BSL')
+  const targetable = allWords.filter(isTargetable)
   const now = new Date().toISOString()
   const due = targetable
     .filter((w) => w.nextReviewAt !== null && w.nextReviewAt <= now)

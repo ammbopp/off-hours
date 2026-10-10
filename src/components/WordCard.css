@@ -31,6 +31,45 @@
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
+  color: inherit;
+}
+
+.word-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.word-card-badge {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.word-card-headword {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.word-card-definition {
+  font-size: 0.9rem;
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.word-card-sentence {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--text);
+  cursor: pointer;
 }
 
 .word-card-translation {

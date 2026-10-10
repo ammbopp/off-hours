@@ -20,7 +20,7 @@ export function VocabBookPage() {
 
   // NGSL คือฐาน "คำที่ถือว่ารู้แล้ว" ใช้คุมระดับภาษาของเนื้อเรื่อง ไม่ใช่คำที่ตอนเลือกมาสอน
   // (ดู README หัวข้อ "ระบบคำศัพท์เบื้องหลัง") จึงแยกออกจากคำเป้าหมาย TSL/BSL/custom ในหน้านี้
-  const targetable = words.filter((w) => w.source !== 'NGSL')
+  const targetable = words.filter((w) => !w.sources.includes('NGSL'))
   const baselineCount = words.length - targetable.length
 
   return (
@@ -46,7 +46,7 @@ export function VocabBookPage() {
             <ul className="vocab-list">
               {shown.map((w) => (
                 <li key={w.id}>
-                  {w.term} <span className="list-row-sub">[{w.source}]</span>
+                  {w.term} <span className="list-row-sub">[{w.sources.join('·')}]</span>
                 </li>
               ))}
             </ul>

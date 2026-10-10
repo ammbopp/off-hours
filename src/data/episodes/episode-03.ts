@@ -2,14 +2,14 @@ import { makeWordId } from '../../lib/wordlists/import'
 import type { Episode } from '../../types'
 
 const targetWordIds = [
-  makeWordId('BSL', 'fraud'),
-  makeWordId('BSL', 'allegation'),
-  makeWordId('BSL', 'integrity'),
-  makeWordId('BSL', 'ethical'),
-  makeWordId('BSL', 'resignation'),
-  makeWordId('BSL', 'termination'),
-  makeWordId('BSL', 'loyalty'),
-  makeWordId('BSL', 'confidential'),
+  makeWordId('fraud'),
+  makeWordId('allegation'),
+  makeWordId('integrity'),
+  makeWordId('ethical'),
+  makeWordId('resignation'),
+  makeWordId('termination'),
+  makeWordId('loyalty'),
+  makeWordId('confidential'),
 ]
 
 export const episode: Episode = {

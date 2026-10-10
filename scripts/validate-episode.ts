@@ -5,7 +5,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { validateEpisode } from '../src/features/story/validateEpisode'
-import type { Episode, WordSource } from '../src/types'
+import type { Episode, Word, WordSource } from '../src/types'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -41,16 +41,38 @@ function buildKnownVocabulary(episode: Episode, wordforms: Wordforms): Set<strin
   for (const forms of Object.values(wordforms.NGSL)) {
     for (const f of forms) known.add(f)
   }
-  for (const wordId of episode.targetWordIds) {
-    const [source, term] = wordId.split(':') as [WordSource, string]
-    const forms = wordforms[source]?.[term] ?? [term]
-    for (const f of forms) known.add(f)
+  // targetWordIds คือตัวคำตรงๆ (ไม่ผูกกับคลัง) จึงค้นรูปแปรจากทุกคลัง
+  for (const term of episode.targetWordIds) {
+    const sources: WordSource[] = ['NGSL', 'TSL', 'BSL']
+    const forms = sources.flatMap((source) => wordforms[source]?.[term] ?? [])
+    for (const f of forms.length > 0 ? forms : [term]) known.add(f)
   }
   return known
 }
 
 function countWords(content: string): number {
   return (content.match(/[a-zA-Z']+/g) ?? []).length
+}
+
+// คำที่ผู้อ่านแตะแล้วไม่ได้อะไรเลย (ไม่มีคำนิยามอังกฤษ และไม่ใช่คำเป้าหมายที่มีคำแปลไทย)
+// คือคำที่บังคับให้ต้องออกไปเปิดแอปพจนานุกรม ซึ่งเป็นสิ่งที่ขั้นที่ 1 สัปดาห์ที่ 2 ตั้งใจกำจัด
+// ชื่อเฉพาะไม่นับ เพราะไม่ต้องมีคำนิยามอยู่แล้ว
+function findUnlookupableWords(episode: Episode, corpus: Word[]): string[] {
+  const definitionByForm = new Map<string, boolean>()
+  for (const word of corpus) {
+    for (const form of word.forms) {
+      if (!definitionByForm.has(form)) definitionByForm.set(form, Boolean(word.definition))
+    }
+  }
+
+  const targetTerms = new Set(episode.targetWordIds)
+  const unique = [...new Set(episode.content.toLowerCase().match(/[a-zà-öø-ÿ]+/g) ?? [])]
+
+  return unique.filter((term) => {
+    if (PROPER_NOUNS.includes(term)) return false
+    if (targetTerms.has(term)) return false // มีคำแปลไทยตามบริบทอยู่แล้ว
+    return definitionByForm.get(term) !== true
+  })
 }
 
 async function main() {
@@ -61,12 +83,13 @@ async function main() {
       : readdirSync(EPISODES_DIR).filter((f) => /^episode-.+\.ts$/.test(f))
 
   const wordforms = loadWordforms()
+  const corpus = JSON.parse(readFileSync(path.join(ROOT, 'public/words.generated.json'), 'utf-8')) as Word[]
   let allValid = true
 
   for (const file of files.sort()) {
     const mod = await import(path.join(EPISODES_DIR, file))
     const episode = mod.episode as Episode
-    const targetTerms = episode.targetWordIds.map((id) => id.split(':')[1])
+    const targetTerms = episode.targetWordIds
     const knownVocabulary = buildKnownVocabulary(episode, wordforms)
     const result = validateEpisode({ content: episode.content, targetTerms, knownVocabulary })
     const wordCount = countWords(episode.content)
@@ -75,6 +98,14 @@ async function main() {
     console.log(`คำทั้งหมด: ${wordCount} คำ | คำเป้าหมาย: ${targetTerms.length} คำ (${targetTerms.join(', ')})`)
     if (wordCount < 800 || wordCount > 1200) {
       console.log(`⚠️  ความยาวนอกช่วง 800–1,200 คำที่แผนกำหนด`)
+    }
+
+    const unlookupable = findUnlookupableWords(episode, corpus)
+    const uniqueWords = new Set(episode.content.toLowerCase().match(/[a-zà-öø-ÿ]+/g) ?? []).size
+    const lookupRate = Math.round(((uniqueWords - unlookupable.length) / uniqueWords) * 100)
+    console.log(`แตะดูความหมายได้: ${lookupRate}% ของคำไม่ซ้ำ (${unlookupable.length} คำที่แตะแล้วไม่มีข้อมูล)`)
+    if (unlookupable.length > 0) {
+      console.log(`   คำที่ยังไม่มีข้อมูล: ${unlookupable.join(', ')}`)
     }
 
     if (result.valid) {

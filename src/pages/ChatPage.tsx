@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
-import { getMessagesForCharacter, putMessage } from '../lib/db'
+import { getAllWords, getMessagesForCharacter, putMessage } from '../lib/db'
 import { characters } from '../features/chat/characters'
-import type { Message } from '../types'
+import { buildWordIndex, lookupWord } from '../features/reading/lookup'
+import { parseText } from '../features/reading/text'
+import type { Message, Word } from '../types'
 
 export function ChatPage() {
   const { characterId } = useParams<{ characterId?: string }>()
@@ -30,12 +32,16 @@ function ChatList() {
 function ChatThread({ characterId }: { characterId: string }) {
   const character = characters.find((c) => c.id === characterId)
   const [messages, setMessages] = useState<Message[]>([])
+  const [words, setWords] = useState<Word[]>([])
   const [draft, setDraft] = useState('')
-  const [selectedTerm, setSelectedTerm] = useState<string | null>(null)
+  const [selected, setSelected] = useState<{ term: string; word?: Word; sentence: string } | null>(null)
 
   useEffect(() => {
     getMessagesForCharacter(characterId).then(setMessages)
+    getAllWords().then(setWords)
   }, [characterId])
+
+  const wordIndex = useMemo(() => buildWordIndex(words), [words])
 
   async function sendMessage() {
     if (!draft.trim()) return
@@ -78,7 +84,12 @@ function ChatThread({ characterId }: { characterId: string }) {
       <div className="chat-messages">
         {messages.map((m) => (
           <div key={m.id} className={m.sender === 'user' ? 'chat-bubble chat-bubble-user' : 'chat-bubble'}>
-            <TappableText text={m.content} onWordTap={setSelectedTerm} />
+            <TappableText
+              paragraphs={parseText(m.content).paragraphs}
+              onWordTap={(term, sentence) =>
+                setSelected({ term, word: lookupWord(wordIndex, term), sentence: sentence.text })
+              }
+            />
             {m.languageTips?.map((tip, i) => (
               <p key={i} className="chat-tip">
                 💡 {tip.original} → <strong>{tip.suggestion}</strong>
@@ -99,7 +110,14 @@ function ChatThread({ characterId }: { characterId: string }) {
           ส่ง
         </button>
       </div>
-      {selectedTerm && <WordCard term={selectedTerm} onClose={() => setSelectedTerm(null)} />}
+      {selected && (
+        <WordCard
+          term={selected.term}
+          word={selected.word}
+          sentence={selected.sentence}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   )
 }

@@ -1,14 +1,17 @@
 import type { Word, WordSource } from '../../types'
 
-export function makeWordId(source: WordSource, term: string): string {
-  return `${source}:${term.toLowerCase()}`
+// id คือตัวคำตัวพิมพ์เล็ก ไม่ผูกกับคลัง เพราะคำเดียวกันอยู่ได้หลายคลัง (TSL กับ BSL ซ้ำกัน 575 คำ)
+// ถ้าผูก id กับคลัง สถานะการเรียนรู้ของคำเดียวกันจะถูกแยกเป็นสองรายการ
+export function makeWordId(term: string): string {
+  return term.toLowerCase()
 }
 
-export function makeBlankWord(term: string, source: WordSource): Word {
+export function makeBlankWord(term: string, sources: WordSource[], forms?: string[]): Word {
   return {
-    id: makeWordId(source, term),
-    term,
-    source,
+    id: makeWordId(term),
+    term: term.toLowerCase(),
+    sources,
+    forms: forms ?? [term.toLowerCase()],
     status: 'new',
     nextReviewAt: null,
     encounters: [],
@@ -16,8 +19,13 @@ export function makeBlankWord(term: string, source: WordSource): Word {
   }
 }
 
+// คำนี้เป็นคำที่ "ต้องสอน" หรือไม่ — NGSL คือฐานที่ถือว่ารู้แล้ว ใช้คุมระดับภาษาเท่านั้น
+export function isTargetable(word: Word): boolean {
+  return word.sources.includes('TSL') || word.sources.includes('BSL')
+}
+
 export interface ParsedWordList {
-  words: Word[] // หนึ่งรายการต่อหนึ่งคำตั้งต้น (lemma/headword) — ใช้เป็นคำในคลังศัพท์ที่ติดตามสถานะ
+  words: Word[] // หนึ่งรายการต่อหนึ่งคำตั้งต้น (lemma/headword) ของคลังนี้
   formsByTerm: Record<string, string[]> // headword (ตัวพิมพ์เล็ก) → รูปแปรทั้งหมดบนบรรทัดเดียวกัน (รวม headword เอง)
 }
 
@@ -40,7 +48,7 @@ export function parseWordListCsv(csvText: string, source: WordSource): ParsedWor
     const headword = forms[0]
     if (!headword) continue
 
-    words.push(makeBlankWord(headword, source))
+    words.push(makeBlankWord(headword, [source], forms))
     formsByTerm[headword] = forms
   }
 

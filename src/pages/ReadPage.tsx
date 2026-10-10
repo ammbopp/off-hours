@@ -1,22 +1,33 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
-import { getAllEpisodes, getAllWords, putWord } from '../lib/db'
+import { getAllEpisodes, getAllWords, getProgress, putWord, updateProgress } from '../lib/db'
 import { recordEncounter } from '../lib/srs'
 import { makeBlankWord } from '../lib/wordlists/import'
+import { buildWordIndex, lookupWord } from '../features/reading/lookup'
+import { parseText, type ParsedSentence } from '../features/reading/text'
+import { useNarration, type NarrationRate } from '../features/reading/useNarration'
 import type { ContextualTranslation, Episode, Word } from '../types'
 
 interface SelectedWord {
   term: string
+  word?: Word
   translation?: ContextualTranslation
+  sentence: string
 }
+
+const RATES: NarrationRate[] = [0.75, 1, 1.25]
 
 export function ReadPage() {
   const { episodeId } = useParams<{ episodeId?: string }>()
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [words, setWords] = useState<Word[]>([])
   const [selected, setSelected] = useState<SelectedWord | null>(null)
+  const [resumeIndex, setResumeIndex] = useState<number | null>(null)
+  const [finished, setFinished] = useState(false)
+
+  const furthestSentenceRef = useRef(0)
 
   useEffect(() => {
     getAllEpisodes().then(setEpisodes)
@@ -27,6 +38,9 @@ export function ReadPage() {
   const episode = episodes[index === -1 ? 0 : index] ?? null
   const nextEpisode = episode ? episodes[episodes.findIndex((e) => e.id === episode.id) + 1] : undefined
 
+  const parsed = useMemo(() => parseText(episode?.content ?? ''), [episode?.content])
+  const wordIndex = useMemo(() => buildWordIndex(words), [words])
+
   const targetTerms = useMemo(() => {
     if (!episode) return new Set<string>()
     const terms = words
@@ -35,13 +49,79 @@ export function ReadPage() {
     return new Set(terms)
   }, [episode, words])
 
-  async function handleWordTap(term: string) {
+  // ไม่แตะ finishedAt ตรงนี้ ปล่อยให้ updateProgress รักษาค่าเดิมไว้
+  // (เคยมีบั๊ก: callback ที่ค้างค่า finished เก่าไว้เขียนทับ finishedAt กลับเป็น null หลังกดอ่านจบ)
+  const saveProgress = useCallback(
+    (sentenceIndex: number) => {
+      if (!episode) return
+      furthestSentenceRef.current = Math.max(furthestSentenceRef.current, sentenceIndex)
+      void updateProgress(episode.id, { lastSentenceIndex: furthestSentenceRef.current })
+    },
+    [episode],
+  )
+
+  const narration = useNarration(parsed.sentences, { onSentenceStart: (i) => saveProgress(i) })
+  const { activeIndex, playing, rate, setRate, speakFrom, stop } = narration
+
+  // โหลดตำแหน่งที่อ่านค้างไว้ของตอนนี้
+  useEffect(() => {
+    if (!episode) return
+    furthestSentenceRef.current = 0
+    setResumeIndex(null)
+    setFinished(false)
+
+    getProgress(episode.id).then((progress) => {
+      if (!progress) return
+      furthestSentenceRef.current = progress.lastSentenceIndex
+      setFinished(Boolean(progress.finishedAt))
+      if (progress.lastSentenceIndex > 0) setResumeIndex(progress.lastSentenceIndex)
+    })
+  }, [episode])
+
+  // หยุดเสียงเมื่อเปลี่ยนตอน
+  useEffect(() => {
+    stop()
+  }, [episode?.id, stop])
+
+  // เลื่อนตามประโยคที่เสียงกำลังอ่าน
+  useEffect(() => {
+    if (activeIndex === null) return
+    document.getElementById(`sentence-${activeIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [activeIndex])
+
+  // จำว่าอ่านถึงประโยคไหนจากการเลื่อนจอ เพื่อเปิดอ่านต่อครั้งหน้าได้
+  useEffect(() => {
+    if (!episode || parsed.sentences.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          const sentenceIndex = Number((entry.target as HTMLElement).dataset.sentence)
+          if (Number.isFinite(sentenceIndex)) {
+            furthestSentenceRef.current = Math.max(furthestSentenceRef.current, sentenceIndex)
+          }
+        }
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    )
+
+    for (const sentence of parsed.sentences) {
+      const element = document.getElementById(`sentence-${sentence.index}`)
+      if (element) observer.observe(element)
+    }
+
+    return () => {
+      observer.disconnect()
+      saveProgress(furthestSentenceRef.current)
+    }
+  }, [episode, parsed.sentences, saveProgress])
+
+  async function handleWordTap(term: string, sentence: ParsedSentence) {
     if (!episode) return
 
-    let word = words.find((w) => w.term.toLowerCase() === term.toLowerCase())
-    if (!word) {
-      word = makeBlankWord(term, 'custom')
-    }
+    const found = lookupWord(wordIndex, term)
+    const word = found ?? makeBlankWord(term, ['custom'])
 
     const updated = recordEncounter(word, {
       mode: 'read',
@@ -54,14 +134,26 @@ export function ReadPage() {
 
     setSelected({
       term,
+      word: updated,
       translation: episode.contextualTranslations[updated.id],
+      sentence: sentence.text,
+    })
+  }
+
+  async function finishEpisode() {
+    if (!episode) return
+    setFinished(true)
+    furthestSentenceRef.current = Math.max(furthestSentenceRef.current, parsed.sentences.length - 1)
+    await updateProgress(episode.id, {
+      lastSentenceIndex: furthestSentenceRef.current,
+      finishedAt: new Date().toISOString(),
     })
   }
 
   if (!episode) {
     return (
       <div className="page">
-        <p>ยังไม่มีตอนให้อ่าน — รอ npm run wordlists:import และ features/story/generateEpisode</p>
+        <p>ยังไม่มีตอนให้อ่าน — รัน npm run wordlists:import และดู src/data/episodes/</p>
       </div>
     )
   }
@@ -69,10 +161,56 @@ export function ReadPage() {
   return (
     <div className="page">
       <h1>{episode.title}</h1>
-      <TappableText text={episode.content} targetTerms={targetTerms} onWordTap={handleWordTap} />
+
+      <div className="reader-toolbar">
+        {narration.supported ? (
+          <>
+            <button className="button" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))}>
+              {playing ? '⏸ หยุดเสียง' : '▶︎ ฟังเสียงบรรยาย'}
+            </button>
+            <div className="reader-rates">
+              {RATES.map((r) => (
+                <button
+                  key={r}
+                  className={r === rate ? 'chip chip-active' : 'chip'}
+                  onClick={() => setRate(r)}
+                >
+                  {r}×
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="card-label">เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน</p>
+        )}
+      </div>
+
+      {resumeIndex !== null && !playing && (
+        <button
+          className="button button-outline reader-resume"
+          onClick={() => {
+            document
+              .getElementById(`sentence-${resumeIndex}`)
+              ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            setResumeIndex(null)
+          }}
+        >
+          อ่านต่อจากที่ค้างไว้
+        </button>
+      )}
+
+      <TappableText
+        paragraphs={parsed.paragraphs}
+        targetTerms={targetTerms}
+        activeSentenceIndex={activeIndex}
+        onWordTap={handleWordTap}
+      />
 
       <div className="read-footer">
-        <Link className="button" to={`/quest/${episode.id}`}>
+        <button className="button" onClick={finishEpisode} disabled={finished}>
+          {finished ? '✓ อ่านจบตอนนี้แล้ว' : 'อ่านจบตอนนี้'}
+        </button>
+        <Link className="button button-outline" to={`/quest/${episode.id}`}>
           ทำภารกิจท้ายตอน
         </Link>
         {nextEpisode && (
@@ -83,7 +221,13 @@ export function ReadPage() {
       </div>
 
       {selected && (
-        <WordCard term={selected.term} translation={selected.translation} onClose={() => setSelected(null)} />
+        <WordCard
+          term={selected.term}
+          word={selected.word}
+          translation={selected.translation}
+          sentence={selected.sentence}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   )

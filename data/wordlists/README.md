@@ -8,7 +8,18 @@
 | `tsl.csv` | TOEIC Service List | 1,250 | https://www.newgeneralservicelist.com/toeic-service-list |
 | `bsl.csv` | Business Service List | 1,744 | https://www.newgeneralservicelist.com/business-service-list |
 
-ถ้าต้องการอัปเดตเป็นเวอร์ชันใหม่กว่านี้ ดาวน์โหลดไฟล์ "lemmatized for teaching" (.csv) จากลิงก์ข้างต้นแล้วทับไฟล์เดิม จากนั้นรัน `npm run wordlists:import` ใหม่
+### ไฟล์คำนิยามภาษาอังกฤษ
+
+| ไฟล์ | คลัง | จำนวนคำนิยาม |
+| --- | --- | --- |
+| `ngsl-definitions.xlsx` | NGSL ("with English definitions") | 2,809 |
+| `tsl-definitions.xlsx` | TSL ("definitions in easy English") | 1,245 |
+
+โครงการ NGSL **ไม่ได้เผยแพร่ไฟล์คำนิยามของ BSL** คำที่อยู่ใน BSL อย่างเดียวจึงไม่มีคำนิยาม (แต่คำที่อยู่ทั้ง TSL และ BSL ได้คำนิยามจากฝั่ง TSL — 575 คำ) ส่วนคำเป้าหมายของแต่ละตอนมีคำแปลไทยตามบริบทเขียนไว้ใน `src/data/episodes/` อยู่แล้ว
+
+ไฟล์ .xlsx อ่านด้วยตัวอ่านขนาดเล็กใน `scripts/lib/xlsx.ts` ซึ่งเรียกคำสั่ง `unzip` ของระบบ จึงไม่ต้องติดตั้งไลบรารีอ่าน Excel เพิ่ม
+
+ถ้าต้องการอัปเดตเป็นเวอร์ชันใหม่กว่านี้ ดาวน์โหลดไฟล์ "lemmatized for teaching" (.csv) และไฟล์คำนิยาม (.xlsx) จากลิงก์ข้างต้นแล้วทับไฟล์เดิม จากนั้นรัน `npm run wordlists:import` ใหม่ และ **เพิ่มเลข `CORPUS_VERSION` ใน `src/lib/db/index.ts`** เพื่อให้แอปโหลดคลังคำใหม่เข้าเครื่อง
 
 ## รูปแบบไฟล์จริง
 

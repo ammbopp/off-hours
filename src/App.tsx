@@ -8,7 +8,7 @@ import { QuestPage } from './pages/QuestPage'
 import { VocabBookPage } from './pages/VocabBookPage'
 import { CallPage } from './pages/CallPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { putMessage, seedIfEmpty } from './lib/db'
+import { seedMessagesOnce, syncContent, syncCorpus } from './lib/db'
 import { characters } from './features/chat/characters'
 import { sampleMessages } from './data/sample'
 import { episodes } from './data/episodes'
@@ -20,18 +20,18 @@ function App() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // คลังคำจริง (NGSL/TSL/BSL ~5,800 คำ) ถูก fetch จากไฟล์สถิตแทนการ bundle เข้า JS
-    // เพราะไฟล์ใหญ่ ~1MB — ดู scripts/import-wordlists.ts
-    fetch('/words.generated.json')
-      .then((res) => res.json() as Promise<Word[]>)
-      .then((words) => seedIfEmpty({ words, characters, episodes }))
-      .then(async (didSeed) => {
-        if (!didSeed) return
-        for (const message of sampleMessages) {
-          await putMessage(message)
-        }
+    async function bootstrap() {
+      // คลังคำจริง (NGSL/TSL/BSL 5,803 คำ พร้อมคำนิยาม) อยู่ในไฟล์สถิตแทนการ bundle เข้า JS
+      // syncCorpus จะ fetch ก็ต่อเมื่อเวอร์ชันคลังคำในเครื่องตามหลัง จึงไม่โหลดซ้ำทุกครั้งที่เปิดแอป
+      await syncCorpus(async () => {
+        const response = await fetch('/words.generated.json')
+        return (await response.json()) as Word[]
       })
-      .finally(() => setReady(true))
+      await syncContent({ episodes, characters })
+      await seedMessagesOnce(sampleMessages)
+    }
+
+    bootstrap().finally(() => setReady(true))
   }, [])
 
   if (!ready) {

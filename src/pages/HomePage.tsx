@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllEpisodes, getAllWords, getMessagesForCharacter } from '../lib/db'
+import { getAllEpisodes, getAllProgress, getAllWords, getMessagesForCharacter } from '../lib/db'
 import { characters } from '../features/chat/characters'
-import type { Episode, Message, Word } from '../types'
+import type { Episode, Message, ReadingProgress, Word } from '../types'
 
 export function HomePage() {
   const [episodes, setEpisodes] = useState<Episode[]>([])
   const [words, setWords] = useState<Word[]>([])
+  const [progress, setProgress] = useState<ReadingProgress[]>([])
   const [previews, setPreviews] = useState<Record<string, Message | undefined>>({})
 
   useEffect(() => {
     getAllEpisodes().then(setEpisodes)
     getAllWords().then(setWords)
+    getAllProgress().then(setProgress)
     Promise.all(
       characters.map(async (c) => {
         const messages = await getMessagesForCharacter(c.id)
@@ -29,12 +31,22 @@ export function HomePage() {
       <section>
         <h3>ตอนทั้งหมด</h3>
         {episodes.length === 0 && <p>ยังไม่มีตอน — ต่อ features/story/generateEpisode เพื่อสร้างตอนแรก</p>}
-        {episodes.map((ep) => (
-          <Link key={ep.id} to={`/read/${ep.id}`} className="list-row">
-            <strong>{ep.title}</strong>
-            <span className="list-row-sub">คำเป้าหมาย {ep.targetWordIds.length} คำ</span>
-          </Link>
-        ))}
+        {episodes.map((ep) => {
+          const episodeProgress = progress.find((p) => p.episodeId === ep.id)
+          const status = episodeProgress?.finishedAt
+            ? '✓ อ่านจบแล้ว'
+            : episodeProgress
+              ? 'กำลังอ่าน'
+              : 'ยังไม่ได้อ่าน'
+          return (
+            <Link key={ep.id} to={`/read/${ep.id}`} className="list-row">
+              <strong>{ep.title}</strong>
+              <span className="list-row-sub">
+                {status} · คำเป้าหมาย {ep.targetWordIds.length} คำ
+              </span>
+            </Link>
+          )
+        })}
       </section>
 
       <section>
