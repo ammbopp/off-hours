@@ -1,5 +1,5 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
-import type { Word, Episode, Character, Message, ReadingProgress, Settings } from '../../types'
+import { DEFAULT_SETTINGS, type Word, type Episode, type Character, type Message, type ReadingProgress, type Settings } from '../../types'
 
 interface OffHoursDB extends DBSchema {
   words: { key: string; value: Word; indexes: { nextReviewAt: string } }
@@ -140,8 +140,12 @@ export async function updateProgress(
   await tx.done
 }
 
+// รวมกับ DEFAULT_SETTINGS เสมอ (ไม่คืนค่าที่บันทึกไว้ตรงๆ) เพราะทุกครั้งที่เพิ่มฟิลด์ใหม่ใน Settings
+// (เช่น readingFont/readingTheme) เครื่องที่เคยบันทึก settings ไว้ก่อนหน้านี้จะไม่มีฟิลด์ใหม่ในค่าที่อ่านได้
+// ถ้าคืนค่าตรงๆ หน้าที่อ่านไปใช้จะเจอ undefined แทนค่าเริ่มต้น การรวมตรงนี้ที่เดียวกันลืมแก้จุดอื่นไม่ได้
 export async function getSettings(): Promise<Settings | undefined> {
-  return (await getDB()).get('settings', 'settings')
+  const stored = await (await getDB()).get('settings', 'settings')
+  return stored ? { ...DEFAULT_SETTINGS, ...stored } : undefined
 }
 
 export async function putSettings(settings: Settings): Promise<void> {

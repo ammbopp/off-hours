@@ -2,14 +2,16 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
+import { ReadingSettingsSheet } from '../components/ReadingSettingsSheet'
 import { PauseIcon, PlayIcon } from '../components/icons'
-import { getAllEpisodes, getAllWords, getProgress, putWord, updateProgress } from '../lib/db'
+import { getAllEpisodes, getAllWords, getProgress, getSettings, putSettings, putWord, updateProgress } from '../lib/db'
+import { applyPreferences } from '../lib/theme'
 import { recordEncounter } from '../lib/srs'
 import { makeBlankWord } from '../lib/wordlists/import'
 import { buildWordIndex, lookupWord } from '../features/reading/lookup'
 import { parseText, type ParsedSentence } from '../features/reading/text'
 import { useNarration, type NarrationRate } from '../features/reading/useNarration'
-import type { ContextualTranslation, Episode, Word } from '../types'
+import { DEFAULT_SETTINGS, type ContextualTranslation, type Episode, type Settings, type Word } from '../types'
 
 interface SelectedWord {
   term: string
@@ -27,13 +29,41 @@ export function ReadPage() {
   const [selected, setSelected] = useState<SelectedWord | null>(null)
   const [resumeIndex, setResumeIndex] = useState<number | null>(null)
   const [finished, setFinished] = useState(false)
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
+  const [showReaderSettings, setShowReaderSettings] = useState(false)
 
   const furthestSentenceRef = useRef(0)
+  // แพทเทิร์นเดียวกับ SettingsPage: ปุ่มปรับหน้าตาใช้ผลทันที+บันทึกทันที ต้องอ่านค่าล่าสุดผ่าน ref
+  // ตอนเซฟ ไม่ใช่จาก closure ตรงๆ เพราะกดสองปุ่มติดกันเร็วๆ อาจอยู่ในแบตช์ re-render เดียวกัน
+  const settingsRef = useRef(settings)
+  settingsRef.current = settings
+  const loadedSettingsRef = useRef(false)
 
   useEffect(() => {
     getAllEpisodes().then(setEpisodes)
     getAllWords().then(setWords)
+    getSettings().then((s) => {
+      if (s) setSettings(s)
+      loadedSettingsRef.current = true
+    })
   }, [])
+
+  // ขนาดตัวอักษรใน panel นี้คือตัวเดียวกับที่ตั้งค่าไว้ทั้งแอป (ไม่ใช่สเกลแยกของหน้าอ่าน) จึงต้อง
+  // applyPreferences ให้ขนาดเปลี่ยนทันทีทั่วแอป ไม่ใช่แค่ในหน้านี้ เหมือนที่ทำใน SettingsPage
+  const { fontSize } = settings
+  useEffect(() => {
+    if (!loadedSettingsRef.current) return
+    applyPreferences({ theme: settingsRef.current.theme, fontSize })
+    void putSettings(settingsRef.current)
+  }, [fontSize])
+
+  // readingFont/readingTheme มีผลแค่ในหน้าอ่าน (ผ่าน data-attribute บน .reader-page) ไม่กระทบ <html>
+  // ทั้งแอป จึงบันทึกเฉยๆ ไม่ต้องเรียก applyPreferences
+  const { readingFont, readingTheme } = settings
+  useEffect(() => {
+    if (!loadedSettingsRef.current) return
+    void putSettings(settingsRef.current)
+  }, [readingFont, readingTheme])
 
   const index = episodeId ? episodes.findIndex((e) => e.id === episodeId) : 0
   const episode = episodes[index === -1 ? 0 : index] ?? null
@@ -175,30 +205,29 @@ export function ReadPage() {
 
   return (
     <div className="page">
-      <h1>{episode.title}</h1>
-
-      <div className="reader-toolbar">
-        {narration.supported ? (
-          <>
-            <button className="button" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))}>
-              {playing ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
-              {playing ? 'หยุดเสียง' : 'ฟังเสียงบรรยาย'}
-            </button>
-            <div className="reader-rates">
-              {RATES.map((r) => (
-                <button
-                  key={r}
-                  className={r === rate ? 'chip chip-active' : 'chip'}
-                  onClick={() => setRate(r)}
-                >
-                  {r}×
-                </button>
-              ))}
-            </div>
-          </>
-        ) : (
-          <p className="card-label">เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน</p>
-        )}
+      <div className="reader-toolbar-row">
+        <div className="reader-toolbar">
+          {narration.supported ? (
+            <>
+              <button className="button" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))}>
+                {playing ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
+                {playing ? 'หยุดเสียง' : 'ฟังเสียงบรรยาย'}
+              </button>
+              <div className="reader-rates">
+                {RATES.map((r) => (
+                  <button key={r} className={r === rate ? 'chip chip-active' : 'chip'} onClick={() => setRate(r)}>
+                    {r}×
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="card-label">เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน</p>
+          )}
+        </div>
+        <button className="reader-aa-button" onClick={() => setShowReaderSettings(true)} aria-label="ตัวอักษรและพื้นหลัง">
+          Aa
+        </button>
       </div>
 
       {resumeIndex !== null && !playing && (
@@ -215,25 +244,29 @@ export function ReadPage() {
         </button>
       )}
 
-      <TappableText
-        paragraphs={parsed.paragraphs}
-        targetTerms={targetTerms}
-        activeSentenceIndex={activeIndex}
-        onWordTap={handleWordTap}
-      />
+      <div className="reader-page" data-reading-theme={settings.readingTheme} data-reading-font={settings.readingFont}>
+        <h1>{episode.title}</h1>
 
-      <div className="read-footer">
-        <button className="button" onClick={finishEpisode} disabled={finished}>
-          {finished ? '✓ อ่านจบตอนนี้แล้ว' : 'อ่านจบตอนนี้'}
-        </button>
-        <Link className="button button-outline" to={`/quest/${episode.id}`}>
-          ทำภารกิจท้ายตอน
-        </Link>
-        {nextEpisode && (
-          <Link className="button button-outline" to={`/read/${nextEpisode.id}`}>
-            ตอนต่อไป: {nextEpisode.title}
+        <TappableText
+          paragraphs={parsed.paragraphs}
+          targetTerms={targetTerms}
+          activeSentenceIndex={activeIndex}
+          onWordTap={handleWordTap}
+        />
+
+        <div className="read-footer">
+          <button className="button" onClick={finishEpisode} disabled={finished}>
+            {finished ? '✓ อ่านจบตอนนี้แล้ว' : 'อ่านจบตอนนี้'}
+          </button>
+          <Link className="button button-outline" to={`/quest/${episode.id}`}>
+            ทำภารกิจท้ายตอน
           </Link>
-        )}
+          {nextEpisode && (
+            <Link className="button button-outline" to={`/read/${nextEpisode.id}`}>
+              ตอนต่อไป: {nextEpisode.title}
+            </Link>
+          )}
+        </div>
       </div>
 
       {selected && (
@@ -243,6 +276,18 @@ export function ReadPage() {
           translation={selected.translation}
           sentence={selected.sentence}
           onClose={() => setSelected(null)}
+        />
+      )}
+
+      {showReaderSettings && (
+        <ReadingSettingsSheet
+          fontSize={settings.fontSize}
+          readingFont={settings.readingFont}
+          readingTheme={settings.readingTheme}
+          onFontSizeChange={(fontSize) => setSettings((prev) => ({ ...prev, fontSize }))}
+          onReadingFontChange={(readingFont) => setSettings((prev) => ({ ...prev, readingFont }))}
+          onReadingThemeChange={(readingTheme) => setSettings((prev) => ({ ...prev, readingTheme }))}
+          onClose={() => setShowReaderSettings(false)}
         />
       )}
     </div>

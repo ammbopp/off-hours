@@ -5,7 +5,7 @@ import { pickTargetWords } from '../lib/srs'
 import { generateEpisode } from '../features/story/generateEpisode'
 import { characters } from '../features/chat/characters'
 import { BookIcon, ChevronRightIcon, SparkleIcon } from '../components/icons'
-import { initials } from '../lib/avatar'
+import { avatarClass, initials } from '../lib/avatar'
 import type { Episode, Message, ReadingProgress, Word } from '../types'
 
 function greeting(): string {
@@ -63,8 +63,11 @@ export function HomePage() {
 
   return (
     <div className="page">
-      <span className="eyebrow">{greeting()}</span>
-      <h1>Off Hours</h1>
+      <div className="hero">
+        <div className="hero-blob" aria-hidden />
+        <span className="eyebrow">{greeting()}</span>
+        <h1>Off Hours</h1>
+      </div>
 
       <section>
         <h3>ตอนทั้งหมด</h3>
@@ -107,7 +110,7 @@ export function HomePage() {
           const preview = previews[c.id]
           return (
             <Link key={c.id} to={`/chat/${c.id}`} className="list-row">
-              <span className="avatar avatar-sm" aria-hidden>
+              <span className={`${avatarClass(c.relation)} avatar-sm`} aria-hidden>
                 {initials(c.name)}
               </span>
               <span className="list-row-text">

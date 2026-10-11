@@ -4,7 +4,7 @@ import { TappableText } from '../components/TappableText'
 import { WordCard } from '../components/WordCard'
 import { ChevronRightIcon, SendIcon } from '../components/icons'
 import { getAllWords, getMessagesForCharacter, putMessage } from '../lib/db'
-import { initials } from '../lib/avatar'
+import { avatarClass, initials } from '../lib/avatar'
 import { characters } from '../features/chat/characters'
 import { buildWordIndex, lookupWord } from '../features/reading/lookup'
 import { parseText } from '../features/reading/text'
@@ -23,7 +23,7 @@ function ChatList() {
       <h1>แชท</h1>
       {characters.map((c) => (
         <Link key={c.id} to={`/chat/${c.id}`} className="list-row">
-          <span className="avatar" aria-hidden>
+          <span className={avatarClass(c.relation)} aria-hidden>
             {initials(c.name)}
           </span>
           <span className="list-row-text">
@@ -98,7 +98,7 @@ function ChatThread({ characterId }: { characterId: string }) {
   return (
     <div className="page chat-thread">
       <div className="chat-header">
-        <span className="avatar" aria-hidden>
+        <span className={avatarClass(character.relation)} aria-hidden>
           {initials(character.name)}
         </span>
         <div>
@@ -110,7 +110,7 @@ function ChatThread({ characterId }: { characterId: string }) {
         {messages.map((m) => (
           <div key={m.id} className={m.sender === 'user' ? 'chat-row chat-row-user' : 'chat-row'}>
             {m.sender !== 'user' && (
-              <span className="avatar avatar-sm" aria-hidden>
+              <span className={`${avatarClass(character.relation)} avatar-sm`} aria-hidden>
                 {initials(character.name)}
               </span>
             )}

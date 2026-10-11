@@ -191,6 +191,42 @@ a {
   margin-bottom: 6px;
 }
 
+/* บล็อบไล่สีเรืองแสงเบาๆ หลังหัวข้อหน้าแรก ให้ความรู้สึก "มีชีวิต" แบบลูกแก้วผู้ช่วย ไม่ใช่แค่ตัวอักษรเรียบๆ */
+.hero {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.hero-blob {
+  position: absolute;
+  top: -36px;
+  right: -16px;
+  width: 130px;
+  height: 130px;
+  background: linear-gradient(135deg, #ffb37a, var(--accent), #b14d7c);
+  border-radius: 58% 42% 65% 35% / 45% 55% 45% 55%;
+  opacity: 0.4;
+  filter: blur(6px);
+  z-index: -1;
+  animation: blob-float 9s ease-in-out infinite;
+}
+
+@keyframes blob-float {
+  0%,
+  100% {
+    border-radius: 58% 42% 65% 35% / 45% 55% 45% 55%;
+  }
+  50% {
+    border-radius: 42% 58% 40% 60% / 58% 42% 58% 42%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-blob {
+    animation: none;
+  }
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -517,6 +553,148 @@ section:first-of-type > h3 {
   margin-bottom: 18px;
 }
 
+/* การ์ด "หน้ากระดาษ" ของเนื้อเรื่อง — แยกโทนสีออกจาก theme ของทั้งแอป (data-theme) โดยตั้งใจ
+   เหมือนแอปอ่านหนังสือทั่วไป (Kindle/Apple Books) ที่ให้เลือกโทนสีตอนอ่านแยกต่างหากจากธีม UI หลัก
+   ทุกอย่างในนี้ (ชื่อตอน, ข้อความ, ปุ่มท้ายตอน) อ้างอิง --reading-* แทน --bg/--text/--surface ตรงๆ */
+.reader-page {
+  --reading-bg: var(--surface);
+  --reading-text: var(--text);
+  --reading-text-muted: var(--text-muted);
+  --reading-highlight: var(--highlight);
+  background: var(--reading-bg);
+  color: var(--reading-text);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px 28px;
+  margin-top: 4px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05), 0 10px 24px -16px rgba(var(--shadow-tint), 0.25);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.reader-page h1 {
+  color: var(--reading-text);
+}
+
+.reader-page[data-reading-theme='paper'] {
+  --reading-bg: #f6efe1;
+  --reading-text: #2b2420;
+  --reading-text-muted: #8a7a65;
+  --reading-highlight: #e9dcb8;
+}
+
+.reader-page[data-reading-theme='white'] {
+  --reading-bg: #ffffff;
+  --reading-text: #1a1a1a;
+  --reading-text-muted: #767676;
+  --reading-highlight: #ffe9a8;
+}
+
+.reader-page[data-reading-theme='sepia'] {
+  --reading-bg: #f1e2c0;
+  --reading-text: #5b4636;
+  --reading-text-muted: #8a7256;
+  --reading-highlight: #e0c98e;
+}
+
+.reader-page[data-reading-theme='gray'] {
+  --reading-bg: #d9d9d9;
+  --reading-text: #242424;
+  --reading-text-muted: #5c5c5c;
+  --reading-highlight: #c3c3c3;
+}
+
+.reader-page[data-reading-theme='night'] {
+  --reading-bg: #000000;
+  --reading-text: #c9c9c9;
+  --reading-text-muted: #797979;
+  --reading-highlight: #2a2a2a;
+}
+
+.reader-page[data-reading-font='serif'] .tappable-paragraph {
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+}
+
+.reader-page[data-reading-font='sans'] .tappable-paragraph {
+  font-family: var(--font-sans);
+}
+
+.reader-page .tappable-paragraph {
+  color: var(--reading-text);
+}
+
+.reader-page .sentence-active {
+  background: var(--reading-highlight);
+}
+
+.reader-page .tappable-word:active {
+  background: var(--reading-highlight);
+}
+
+.reader-page .tappable-word-target {
+  text-decoration-color: var(--accent);
+}
+
+.reader-toolbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.reader-aa-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reading-settings-sheet .field {
+  margin-bottom: 18px;
+}
+
+.reading-font-sample {
+  flex: 1;
+}
+
+.reading-theme-swatches {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.reading-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reading-swatch-active {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}
+
+.reading-swatch svg {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
+  color: #ffffff;
+}
+
 .read-footer {
   display: flex;
   flex-direction: column;
@@ -638,6 +816,8 @@ section:first-of-type > h3 {
   margin-bottom: 20px;
 }
 
+/* อวาตาร์ทรงกลมเรืองแสงนุ่มๆ แบบลูกแก้วไล่สี แต่ละตัวละครมีโทนสีจำง่ายของตัวเอง (ดู .avatar-coworker ฯลฯ)
+   ตั้งใจให้รู้สึกเหมือน "ตัวตน" ที่มีชีวิต มากกว่าวงกลมสีเรียบๆ — เหมาะกับแอปที่ตัวละครทักแชทเข้ามาเอง */
 .avatar {
   display: flex;
   align-items: center;
@@ -651,13 +831,47 @@ section:first-of-type > h3 {
   font-weight: 600;
   font-size: 1.05rem;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px -4px rgba(var(--shadow-tint), 0.4);
+  box-shadow:
+    0 4px 10px -4px rgba(var(--shadow-tint), 0.4),
+    0 0 0 4px var(--glow-color, transparent);
+  position: relative;
+}
+
+.avatar::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.35;
+  filter: blur(8px);
+  z-index: -1;
+}
+
+.avatar-coworker {
+  background: linear-gradient(155deg, #ffb37a, var(--accent-strong));
+  --glow-color: rgba(226, 87, 46, 0.12);
+}
+
+.avatar-bestfriend {
+  background: linear-gradient(155deg, #8fe3df, var(--accent-2));
+  --glow-color: rgba(46, 110, 115, 0.14);
+}
+
+.avatar-partner {
+  background: linear-gradient(155deg, #f9afc9, #b14d7c);
+  --glow-color: rgba(177, 77, 124, 0.14);
 }
 
 .avatar-sm {
   width: 34px;
   height: 34px;
   font-size: 0.85rem;
+}
+
+.avatar-sm::after {
+  inset: -4px;
+  filter: blur(5px);
 }
 
 .chat-header h1 {
@@ -750,12 +964,19 @@ section:first-of-type > h3 {
 }
 
 .onboarding-hero .brand-mark {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 72px;
+  height: 72px;
   margin: 0 auto 14px;
-  background: linear-gradient(155deg, #ff8355, var(--accent-strong));
-  box-shadow: 0 12px 24px -10px rgba(var(--shadow-tint), 0.5);
+  background: linear-gradient(145deg, #ffb37a, var(--accent), #b14d7c);
+  border-radius: 58% 42% 65% 35% / 45% 55% 45% 55%;
+  box-shadow: 0 16px 32px -12px rgba(var(--shadow-tint), 0.5);
+  animation: blob-float 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-hero .brand-mark {
+    animation: none;
+  }
 }
 
 .onboarding-hero h1 {

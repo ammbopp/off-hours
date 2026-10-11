@@ -1,5 +1,5 @@
 import { characters } from '../features/chat/characters'
-import { initials } from '../lib/avatar'
+import { avatarClass, initials } from '../lib/avatar'
 import { PhoneIcon } from '../components/icons'
 
 // เว็บแอปทำให้เครื่องดังเหมือนสายจริงไม่ได้ จึงแสดงเป็น "สายที่ไม่ได้รับ" แทน (ดู README หัวข้อการโทร)
@@ -10,7 +10,7 @@ export function CallPage() {
       <h1>โทร</h1>
       {characters.map((c) => (
         <div key={c.id} className="card call-card">
-          <span className="avatar" aria-hidden>
+          <span className={avatarClass(c.relation)} aria-hidden>
             {initials(c.name)}
           </span>
           <div className="call-card-info">
