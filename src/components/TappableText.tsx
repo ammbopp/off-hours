@@ -3,8 +3,9 @@ import './TappableText.css'
 
 interface TappableTextProps {
   paragraphs: ParsedParagraph[]
-  targetTerms?: Set<string> // ตัวพิมพ์เล็กทั้งหมด ใช้ขีดเส้นใต้คำเป้าหมาย
+  targetTerms?: Set<string> // ตัวพิมพ์เล็กทั้งหมด ใช้ไฮไลต์คำเป้าหมาย
   activeSentenceIndex?: number | null // ประโยคที่เสียงบรรยายกำลังอ่าน
+  selectedTerm?: string | null // คำที่การ์ดคำศัพท์กำลังเปิดอยู่ตอนนี้ (ตัวพิมพ์เล็ก) ให้ไฮไลต์เข้มกว่าคำเป้าหมายอื่น
   onWordTap: (term: string, sentence: ParsedSentence) => void
 }
 
@@ -13,7 +14,7 @@ const WORD_PATTERN = /([A-Za-zÀ-ÖØ-öø-ÿ']+)/g
 
 // แยกข้อความเป็นคำที่แตะได้ ใช้ทั้งในหน้าอ่านนิยายและหน้าแชท
 // แต่ละประโยคห่อด้วย <span data-sentence> เพื่อไฮไลต์ตอนฟังเสียงและเลื่อนกลับไปจุดที่อ่านค้างไว้
-export function TappableText({ paragraphs, targetTerms, activeSentenceIndex, onWordTap }: TappableTextProps) {
+export function TappableText({ paragraphs, targetTerms, activeSentenceIndex, selectedTerm, onWordTap }: TappableTextProps) {
   return (
     <>
       {paragraphs.map((paragraph, pIndex) => (
@@ -29,17 +30,24 @@ export function TappableText({ paragraphs, targetTerms, activeSentenceIndex, onW
                 if (!/^[A-Za-zÀ-ÖØ-öø-ÿ']+$/.test(chunk)) {
                   return <span key={cIndex}>{chunk}</span>
                 }
-                const isTarget = targetTerms?.has(chunk.toLowerCase())
+                const lower = chunk.toLowerCase()
+                const isTarget = targetTerms?.has(lower)
+                const isSelected = isTarget && selectedTerm === lower
                 // span ไม่ใช่ button โดยตั้งใจ: <button> ใน Chrome/Safari ยังคงพฤติกรรม "กล่อง atomic"
                 // ที่ยอมให้ตัดขึ้นบรรทัดใหม่ได้ที่ขอบของมันแม้ตั้ง display:inline + appearance:none แล้วก็ตาม
                 // (ปัญหานี้ทำให้เครื่องหมายวรรคตอนท้ายคำ เช่น "Friday." หลุดไปขึ้นบรรทัดใหม่เอง)
                 // span + role="button" ให้ผลลัพธ์แบบ inline จริงๆ โดยยังกด Enter/Space ได้เหมือน button
+                const className = isSelected
+                  ? 'tappable-word tappable-word-target tappable-word-selected'
+                  : isTarget
+                    ? 'tappable-word tappable-word-target'
+                    : 'tappable-word'
                 return (
                   <span
                     key={cIndex}
                     role="button"
                     tabIndex={0}
-                    className={isTarget ? 'tappable-word tappable-word-target' : 'tappable-word'}
+                    className={className}
                     onClick={() => onWordTap(chunk, sentence)}
                     onKeyDown={(e) => {
                       if (e.key !== 'Enter' && e.key !== ' ') return

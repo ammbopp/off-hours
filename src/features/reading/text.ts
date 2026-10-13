@@ -35,6 +35,14 @@ function splitSentences(paragraph: string): string[] {
   return parts
 }
 
+const WORDS_PER_MINUTE = 190 // ความเร็วอ่านเฉลี่ยคร่าวๆ ใช้ประมาณเวลาอ่านจากจำนวนคำจริงของตอน
+
+// ใช้ทั้งหน้าอ่าน (แสดงเวลาอ่านของตอนที่กำลังอ่าน) และหน้าแรก (แสดงเวลาอ่านของตอนที่ชวนอ่านต่อ)
+export function estimateReadMinutes(content: string): number {
+  const wordCount = content.split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE))
+}
+
 export function parseText(content: string): ParsedText {
   const sentences: ParsedSentence[] = []
   const paragraphs: ParsedParagraph[] = content

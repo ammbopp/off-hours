@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { BookIcon, ChatIcon, HomeIcon, PhoneIcon, QuestIcon, SettingsIcon, VocabIcon } from './icons'
+import { ChatIcon, HomeIcon, PhoneIcon, SettingsIcon, VocabIcon } from './icons'
 import './NavBar.css'
 
+// 5 แท็บตามระบบนำทางของดีไซน์อ้างอิง (Story/Chat/Calls/Library/Settings) — ตัด "อ่าน" และ "ภารกิจ"
+// ออกจากแท็บถาวร เพราะมีทางเข้าอยู่แล้วจากหน้าแรก (รายการตอน) และท้ายตอนอ่าน (ปุ่ม "ทำภารกิจท้ายตอน")
+// ตามลำดับ ไม่จำเป็นต้องมีที่นั่งถาวรในแถบนำทางล่าง
 const tabs = [
   { to: '/', label: 'หน้าแรก', Icon: HomeIcon },
-  { to: '/read', label: 'อ่าน', Icon: BookIcon },
   { to: '/chat', label: 'แชท', Icon: ChatIcon },
-  { to: '/quest', label: 'ภารกิจ', Icon: QuestIcon },
   { to: '/vocab', label: 'คำศัพท์', Icon: VocabIcon },
   { to: '/call', label: 'โทร', Icon: PhoneIcon },
   { to: '/settings', label: 'ตั้งค่า', Icon: SettingsIcon },

@@ -1,31 +1,41 @@
+/* โทนสีและตัวอักษรอ้างอิงจาก stitch_cozy_novel_reader_ui: ธีมสว่าง "Off Hours Editorial Cozy"
+   และธีมมืด "Nocturne Sanctuary" — ค่าสีตรงนี้ดึงมาจาก DESIGN.md/code.html ของทั้งสองธีมตรงๆ
+   ไม่ได้ประมาณเอง เพื่อให้ตรงกับภาพตัวอย่างที่ผู้ใช้ส่งมา */
 :root {
-  --bg: #fbf6ef;
-  --surface: #ffffff;
-  --surface-muted: #f4ede2;
-  --surface-hover: #f8f1e6;
-  --text: #241a12;
-  --text-muted: #8a7b6c;
-  --text-faint: #b9ac9c;
-  --border: #ece2d2;
-  --border-strong: #ddcdb5;
+  --bg: #fff8f4;
+  --surface: #faf2ed;
+  --surface-muted: #f4ece7;
+  --surface-hover: #eee7e2;
+  --text: #1e1b18;
+  --text-muted: #56423d;
+  --text-faint: #89726c;
+  --border: #dcc1b9;
+  --border-strong: #89726c;
 
-  --accent: #e2572e;
-  --accent-strong: #c23f1c;
-  --accent-soft: #fce3d6;
-  --accent-2: #2e6e73;
-  --accent-2-soft: #dceeef;
-  --highlight: #fce2a8;
-  --success: #3f8f5f;
-  --success-soft: #e1f1e6;
+  --accent: #b9583b;
+  --accent-strong: #994126;
+  --accent-soft: #ffdbd1;
+  --accent-2: #4c6544;
+  --accent-2-soft: #cdebc1;
+  --highlight: rgba(249, 187, 90, 0.32);
+  --highlight-strong: #f9bb5a;
+  --highlight-text: #7d5400;
+  --success: #4c6544;
+  --success-soft: #cdebc1;
 
-  --shadow-tint: 36, 26, 18;
+  /* การ์ดป็อปอัพคำศัพท์ตั้งใจให้ "มืดเสมอ" ทั้งสองธีม (สลับกับสีพื้นหลังหน้าปกติ) เหมือนสปอตไลต์ส่องคำ */
+  --inverse-surface: #33302d;
+  --inverse-on-surface: #f7efea;
 
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --shadow-tint: 30, 27, 24;
+
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-reading: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   --radius-sm: 10px;
   --radius-md: 16px;
-  --radius-lg: 22px;
+  --radius-lg: 24px;
   --radius-full: 999px;
 
   color-scheme: light;
@@ -34,52 +44,64 @@
 /* โหมดมืดตามระบบ — ใช้เมื่อผู้ใช้ไม่ได้เลือกไว้ชัดเจนใน settings (theme: 'system') */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #14110c;
-    --surface: #1e1811;
-    --surface-muted: #261f16;
-    --surface-hover: #2c251a;
-    --text: #f6efe3;
-    --text-muted: #a99a87;
-    --text-faint: #6f6152;
-    --border: #322a1e;
-    --border-strong: #463a27;
+    --bg: #151311;
+    --surface: #1d1b19;
+    --surface-muted: #211f1d;
+    --surface-hover: #2c2927;
+    --text: #e8e1dd;
+    --text-muted: #dbc1ba;
+    --text-faint: #a38b86;
+    --border: #55423e;
+    --border-strong: #a38b86;
 
-    --accent: #ff7a4d;
-    --accent-strong: #ff9568;
-    --accent-soft: #3a2316;
-    --accent-2: #74b9bd;
-    --accent-2-soft: #1c3133;
-    --highlight: #4a3a19;
-    --success: #5cbb80;
-    --success-soft: #1d3326;
+    --accent: #e07a5f;
+    --accent-strong: #ffb4a1;
+    --accent-soft: #733917;
+    --accent-2: #ffb691;
+    --accent-2-soft: #733917;
+    --highlight: rgba(188, 141, 95, 0.28);
+    --highlight-strong: #bc8d5f;
+    --highlight-text: #ffdcbd;
+    --success: #ffb691;
+    --success-soft: #733917;
+
+    --inverse-surface: #e8e1dd;
+    --inverse-on-surface: #33302d;
 
     --shadow-tint: 0, 0, 0;
+    --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color-scheme: dark;
   }
 }
 
 /* ผู้ใช้เลือกโหมดมืดเองใน settings ไม่ว่าระบบจะตั้งไว้เป็นโหมดไหน */
 :root[data-theme='dark'] {
-  --bg: #14110c;
-  --surface: #1e1811;
-  --surface-muted: #261f16;
-  --surface-hover: #2c251a;
-  --text: #f6efe3;
-  --text-muted: #a99a87;
-  --text-faint: #6f6152;
-  --border: #322a1e;
-  --border-strong: #463a27;
+  --bg: #151311;
+  --surface: #1d1b19;
+  --surface-muted: #211f1d;
+  --surface-hover: #2c2927;
+  --text: #e8e1dd;
+  --text-muted: #dbc1ba;
+  --text-faint: #a38b86;
+  --border: #55423e;
+  --border-strong: #a38b86;
 
-  --accent: #ff7a4d;
-  --accent-strong: #ff9568;
-  --accent-soft: #3a2316;
-  --accent-2: #74b9bd;
-  --accent-2-soft: #1c3133;
-  --highlight: #4a3a19;
-  --success: #5cbb80;
-  --success-soft: #1d3326;
+  --accent: #e07a5f;
+  --accent-strong: #ffb4a1;
+  --accent-soft: #733917;
+  --accent-2: #ffb691;
+  --accent-2-soft: #733917;
+  --highlight: rgba(188, 141, 95, 0.28);
+  --highlight-strong: #bc8d5f;
+  --highlight-text: #ffdcbd;
+  --success: #ffb691;
+  --success-soft: #733917;
+
+  --inverse-surface: #e8e1dd;
+  --inverse-on-surface: #33302d;
 
   --shadow-tint: 0, 0, 0;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color-scheme: dark;
 }
 
@@ -118,7 +140,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
   margin: 0;
 }
@@ -409,25 +431,103 @@ section:first-of-type > h3 {
   box-shadow: none;
 }
 
-.quest-card {
-  position: relative;
-  padding-left: 54px;
+/* ---- ภารกิจท้ายตอน: ตามดีไซน์อ้างอิง desk_missions_nightly_tasks ---- */
+/* หมายเหตุ: ดีไซน์อ้างอิงปั้นเนื้อหาเฉพาะทาง (อีเมล/Slack/ปฏิทิน) ที่ไม่มีข้อมูลจริงรองรับ จึงยืมแค่
+   "ภาษาภาพ" (การ์ดภารกิจ + ไอคอนตามประเภท + สรุปท้าย) มาใช้กับคำถามแบบเลือกตอบจริงที่มีอยู่ */
+
+.quest-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 18px;
 }
 
-.quest-number {
-  position: absolute;
-  left: 18px;
-  top: 18px;
-  width: 26px;
-  height: 26px;
+.quest-header {
+  margin-bottom: 18px;
+}
+
+.quest-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.quest-progress-pill {
+  display: inline-block;
+  margin-top: 8px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  padding: 5px 13px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.quest-recap-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.quest-recap-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+  flex-shrink: 0;
+}
+
+.quest-recap-card p {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.quest-mission-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05), 0 10px 24px -16px rgba(var(--shadow-tint), 0.25);
+}
+
+.quest-mission-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quest-mission-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--accent-soft);
   color: var(--accent-strong);
-  font-size: 0.8rem;
-  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.quest-mission-eyebrow {
+  margin: 0;
 }
 
 .quest-prompt {
@@ -436,11 +536,84 @@ section:first-of-type > h3 {
   margin: 0;
 }
 
+.quest-blank-pill {
+  display: inline-flex;
+  align-items: center;
+  background: var(--highlight);
+  color: var(--highlight-text);
+  border-radius: var(--radius-full);
+  padding: 1px 11px;
+  font-weight: 700;
+  margin: 0 2px;
+}
+
+.quest-blank-pill-ok {
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+}
+
+.quest-blank-placeholder {
+  display: inline-block;
+  border-bottom: 2px dashed var(--border-strong);
+  min-width: 70px;
+  margin: 0 2px;
+}
+
 .quest-choices {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin: 10px 0;
+}
+
+.quest-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.quest-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: var(--surface-muted);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  font-size: 0.92rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.quest-option:disabled {
+  cursor: default;
+}
+
+.quest-option-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-hover);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.quest-option-correct {
+  background: var(--accent-2-soft);
+  border-color: var(--accent-2);
+}
+
+.quest-option-correct .quest-option-dot {
+  background: var(--accent-2);
+}
+
+.quest-option-wrong {
+  opacity: 0.6;
 }
 
 .quest-feedback {
@@ -453,6 +626,53 @@ section:first-of-type > h3 {
 
 .quest-feedback-ok {
   color: var(--success);
+}
+
+.quest-postlude-card {
+  text-align: center;
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+  padding: 26px 20px;
+  margin-top: 8px;
+}
+
+.quest-postlude-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-2-soft);
+  color: var(--accent-2);
+  margin: 0 auto 12px;
+}
+
+.quest-postlude-card h3 {
+  margin-bottom: 4px;
+}
+
+.quest-postlude-words {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin: 16px 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.quest-postlude-words svg {
+  color: var(--highlight-strong);
+  flex-shrink: 0;
+}
+
+.quest-postlude-cta {
+  width: 100%;
 }
 
 .field {
@@ -493,23 +713,6 @@ section:first-of-type > h3 {
   font-size: 0.88rem;
 }
 
-.reader-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
-}
-
-.reader-rates {
-  display: flex;
-  gap: 6px;
-  background: var(--surface-muted);
-  padding: 4px;
-  border-radius: var(--radius-full);
-}
-
 .chip {
   border: 1.5px solid var(--border);
   background: var(--surface);
@@ -534,16 +737,6 @@ section:first-of-type > h3 {
   background: linear-gradient(155deg, var(--accent), var(--accent-strong));
   border-color: transparent;
   color: #fff;
-}
-
-.reader-rates .chip {
-  border: none;
-  background: transparent;
-  padding: 6px 12px;
-}
-
-.reader-rates .chip-active {
-  box-shadow: 0 2px 8px -4px rgba(var(--shadow-tint), 0.5);
 }
 
 .reader-resume {
@@ -612,7 +805,7 @@ section:first-of-type > h3 {
 }
 
 .reader-page[data-reading-font='serif'] .tappable-paragraph {
-  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-reading);
 }
 
 .reader-page[data-reading-font='sans'] .tappable-paragraph {
@@ -621,6 +814,18 @@ section:first-of-type > h3 {
 
 .reader-page .tappable-paragraph {
   color: var(--reading-text);
+}
+
+.reader-page[data-reading-font-size='sm'] .tappable-paragraph {
+  font-size: 1rem;
+}
+
+.reader-page[data-reading-font-size='md'] .tappable-paragraph {
+  font-size: 1.1rem;
+}
+
+.reader-page[data-reading-font-size='lg'] .tappable-paragraph {
+  font-size: 1.3rem;
 }
 
 .reader-page .sentence-active {
@@ -635,6 +840,23 @@ section:first-of-type > h3 {
   text-decoration-color: var(--accent);
 }
 
+/* แถบแสดงความคืบหน้าในการอ่านตอนนี้ — เต็มความกว้างหน้าจอ อ้างอิงจากประโยคที่อ่านไกลสุด
+   (ไม่ใช่ scroll position ตรงๆ) ให้ตรงกับระบบ "อ่านต่อจากที่ค้างไว้" ที่มีอยู่แล้ว */
+.reader-progress-track {
+  position: sticky;
+  top: 0;
+  height: 3px;
+  background: var(--surface-muted);
+  margin: -28px -18px 16px;
+  z-index: 5;
+}
+
+.reader-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
 .reader-toolbar-row {
   display: flex;
   align-items: center;
@@ -643,21 +865,190 @@ section:first-of-type > h3 {
   margin-bottom: 14px;
 }
 
-.reader-aa-button {
+.reader-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reader-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ปุ่มเปิดแผงปรับหน้าตา — เลียนแบบ "Aa + จุดสีตัวอย่าง 3 จุด" ของดีไซน์อ้างอิง
+   แพ็กทุกอย่างในปุ่มเดียว กดที่ไหนในปุ่มก็เปิดแผงเต็ม (5 ธีมสี + 2 ฟอนต์ + 3 ขนาด) เหมือนเดิม */
+.reader-aa-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface-muted);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.reader-aa-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.reader-aa-swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.reader-aa-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+.reader-atmosphere {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--reading-text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.reader-atmosphere-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.reader-atmosphere-sep {
+  opacity: 0.5;
+}
+
+.reader-calm-strip {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(var(--shadow-tint), 0.06);
+  color: var(--reading-text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+/* แถบเสียงบรรยายลอยด้านล่าง แทนที่ปุ่มเล่น+ชิปความเร็วแบบเดิมในแถวบน ให้ยังฟังได้ตลอดการเลื่อนอ่าน */
+.reader-audio-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: 0 10px 30px -10px rgba(var(--shadow-tint), 0.4);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  z-index: 45;
+}
+
+.reader-audio-play {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1.5px solid var(--border-strong);
-  background: var(--surface);
-  color: var(--text);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.85rem;
+  border: none;
+  background: linear-gradient(155deg, var(--accent), var(--accent-strong));
+  color: #fff;
   cursor: pointer;
   flex-shrink: 0;
+}
+
+.reader-audio-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.reader-audio-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.reader-audio-position {
+  font-variant-numeric: tabular-nums;
+}
+
+.reader-audio-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+}
+
+.reader-audio-bar-el {
+  width: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+.reader-audio-bar-animated {
+  animation: wave-bounce 0.9s ease-in-out infinite;
+}
+
+@keyframes wave-bounce {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleY(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.2);
+  }
+}
+
+.reader-audio-speed {
+  flex-shrink: 0;
+  border: none;
+  background: var(--surface-muted);
+  color: var(--text);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .reading-settings-sheet .field {
@@ -693,6 +1084,10 @@ section:first-of-type > h3 {
 .reading-swatch svg {
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.6));
   color: #ffffff;
+}
+
+.reader-page-outer {
+  padding-bottom: 150px;
 }
 
 .read-footer {
@@ -732,19 +1127,9 @@ section:first-of-type > h3 {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.vocab-list li {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
   gap: 8px;
-  padding: 11px 2px;
-  border-bottom: 1px solid var(--border);
-  flex-wrap: wrap;
-}
-
-.vocab-list li:last-child {
-  border-bottom: none;
 }
 
 .status-dot {
@@ -756,8 +1141,10 @@ section:first-of-type > h3 {
   flex-shrink: 0;
 }
 
+/* ใช้ --highlight-strong แทน --success เพราะ --success กับ --accent-2 (เคยเห็น) เป็นสีเดียวกันในทั้งสองธีม
+   ทำให้แยกขั้น "เคยเห็น" กับ "ใช้เป็น" ไม่ออกในแถบ/ป้ายสีจุด 4 ขั้นของสมุดคำศัพท์ */
 .status-dot-mastered {
-  background: var(--success);
+  background: var(--highlight-strong);
 }
 .status-dot-remembered {
   background: var(--accent);
@@ -783,37 +1170,189 @@ section:first-of-type > h3 {
   margin-left: 6px;
 }
 
-.call-card {
+/* ---- โทร: ยืมแค่ "ภาษาภาพ" ของ active_audio_call_live_practice (วงแหวนเรืองแสงรอบอวาตาร์) มาใช้
+   ไม่ปั้นหน้าจอคุยสด/transcript/ไมค์ปลอมๆ เพราะยังไม่มีระบบเสียงเรียลไทม์จริงรองรับ */
+.call-character-card {
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05), 0 10px 24px -16px rgba(var(--shadow-tint), 0.25);
+}
+
+.call-avatar-glow {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 14px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
 }
 
-.call-card-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.call-card-info h3 {
-  margin: 0;
-}
-
-.call-card-button {
-  flex-shrink: 0;
-  padding: 12px;
+.call-avatar-glow::before,
+.call-avatar-glow::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
   border-radius: 50%;
+  background: var(--accent-soft);
+  opacity: 0.4;
+  animation: call-glow-pulse 2.6s ease-in-out infinite;
+}
+
+.call-avatar-glow::after {
+  inset: -18px;
+  opacity: 0.22;
+  animation-delay: 0.5s;
+}
+
+@keyframes call-glow-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-avatar-glow::before,
+  .call-avatar-glow::after {
+    animation: none;
+  }
+}
+
+.call-avatar {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  font-size: 1.5rem;
+}
+
+.call-character-card h3 {
+  margin-bottom: 2px;
+}
+
+.call-status-btn {
+  margin-top: 14px;
+}
+
+.call-status-note {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.call-status-note p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.call-status-link {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-decoration: none;
 }
 
 .chat-thread {
   display: flex;
   flex-direction: column;
+  padding-bottom: 20px;
 }
 
-.chat-header {
+/* scrollIntoView({block:'end'}) จัดให้ขอบล่างของ sentinel ชนขอบล่างสุดของวิวพอร์ตพอดี — ถ้า sentinel
+   สูง 0 แล้วข้อความสุดท้ายจะโผล่ไปอยู่ใต้ .chat-input-tray (ลอยทับอยู่) พอดี ให้ sentinel นี้มีความสูง
+   เท่าพื้นที่ที่ถาดลอยกินไปแทน ข้อความสุดท้ายจะได้โผล่พ้นถาดขึ้นมาจริงๆ */
+.chat-scroll-anchor {
+  height: 90px;
+}
+
+.chat-context-card {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05);
+}
+
+.chat-context-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-context-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-divider {
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 14px;
+}
+
+.chat-divider span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: var(--surface-muted);
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+}
+
+.chat-bubble-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.chat-bubble-user .chat-bubble-meta {
+  justify-content: flex-end;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.chat-listen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.chat-used-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-end;
+  margin-top: 5px;
+  background: var(--highlight);
+  color: var(--highlight-text);
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  padding: 5px 11px;
 }
 
 /* อวาตาร์ทรงกลมเรืองแสงนุ่มๆ แบบลูกแก้วไล่สี แต่ละตัวละครมีโทนสีจำง่ายของตัวเอง (ดู .avatar-coworker ฯลฯ)
@@ -874,10 +1413,6 @@ section:first-of-type > h3 {
   filter: blur(5px);
 }
 
-.chat-header h1 {
-  margin-bottom: 2px;
-}
-
 .chat-messages {
   display: flex;
   flex-direction: column;
@@ -894,12 +1429,24 @@ section:first-of-type > h3 {
   flex-direction: row-reverse;
 }
 
+.chat-bubble-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 78%;
+}
+
+.chat-row-user .chat-bubble-stack {
+  align-items: flex-end;
+}
+
 .chat-bubble {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px 18px 18px 6px;
+  /* มุมบนซ้ายหยัก (ไม่ใช่มุมล่างซ้าย) ชี้ไปทางอวาตาร์ที่อยู่เหนือ-ซ้ายบับเบิล ตามรูปแบบ rounded-tl-sm ของ
+     ดีไซน์อ้างอิง — ฝั่งผู้ใช้หยักมุมบนขวาแทนด้วยเหตุผลเดียวกัน (ดู .chat-bubble-user) */
+  border-radius: 6px 18px 18px 18px;
   padding: 11px 15px;
-  max-width: 78%;
   box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05);
 }
 
@@ -908,7 +1455,7 @@ section:first-of-type > h3 {
   background: linear-gradient(155deg, var(--accent), var(--accent-strong));
   color: #fff;
   border-color: transparent;
-  border-radius: 18px 18px 6px 18px;
+  border-radius: 18px 6px 18px 18px;
 }
 
 .chat-tip {
@@ -927,18 +1474,44 @@ section:first-of-type > h3 {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* "ถาดลอย" ครอบช่องพิมพ์ไว้อีกชั้น (Level 1 raised tray) ตามดีไซน์อ้างอิง แทนที่ input จะลอยอยู่
+   บนพื้นหลังหน้าตรงๆ — ช่องพิมพ์ด้านในเป็น pill สีเข้มกว่าถาดเล็กน้อย (recessed) ไม่มีเส้นขอบจนกว่าจะโฟกัส */
+/* ลอยติดอยู่เหนือแถบนำทางล่างตลอด (ระยะห่างเท่า .reader-audio-bar) แทนที่จะอยู่ท้ายรายการข้อความแล้ว
+   เลื่อนจอหายไปเมื่อแชทยาวขึ้น — ผู้ใช้แจ้งว่าต้องเลื่อนลงสุดทุกครั้งกว่าจะเจอช่องพิมพ์ */
+.chat-input-tray {
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  max-width: 604px;
+  margin: 0 auto;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: color-mix(in srgb, var(--surface-muted) 90%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 8px;
+  box-shadow: 0 10px 30px -10px rgba(var(--shadow-tint), 0.4);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  z-index: 45;
+}
+
 .chat-input-row {
   display: flex;
   gap: 8px;
-  margin-top: 20px;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .chat-input-row input {
   flex: 1;
-  padding: 13px 18px;
+  min-width: 0;
+  padding: 12px 18px;
   border-radius: var(--radius-full);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid transparent;
   background: var(--surface);
   color: var(--text);
   transition: border-color 0.15s ease;
@@ -1006,4 +1579,680 @@ section:first-of-type > h3 {
 .icon {
   display: block;
   flex-shrink: 0;
+}
+
+/* ---- หน้าแรก: ตามดีไซน์อ้างอิง story_hub_season_feed ---- */
+
+/* การ์ด "ทักทายยามเย็น" ครอบ eyebrow/หัวข้อ/pills ทั้งหมดไว้ด้วยกัน ตาม bg-surface-container-low
+   rounded-2xl p-5 shadow-sm ของดีไซน์อ้างอิง (ตัว .hero เฉยๆ ใช้ร่วมกับหน้าอื่นที่ไม่มีการ์ดนี้ด้วย
+   จึงแยกเป็นคลาสเฉพาะหน้าแรกแทนที่จะแก้ .hero ตรงๆ) */
+.home-greeting-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05);
+}
+
+.home-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.home-hero-sub {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+
+.home-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.home-section-link-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.home-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.home-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+/* การ์ด "ตอนที่ชวนอ่านต่อ" — แถบบรรยากาศเป็นไล่สีล้วน (ไม่มีรูปจริงให้ใช้) แทนภาพถ่ายในดีไซน์ต้นฉบับ
+   เพื่อไม่ต้องปลอมรูปที่ไม่มีอยู่จริง */
+.home-feature-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05), 0 10px 24px -16px rgba(var(--shadow-tint), 0.3);
+  margin-bottom: 14px;
+}
+
+.home-feature-atmosphere {
+  height: 88px;
+  background: linear-gradient(135deg, var(--accent-soft), var(--accent) 60%, var(--accent-strong));
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 12px;
+}
+
+.home-feature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent-strong);
+  border-radius: var(--radius-full);
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(var(--shadow-tint), 0.2);
+}
+
+.home-feature-body {
+  padding: 18px;
+}
+
+.home-feature-eyebrow {
+  margin-bottom: 4px;
+}
+
+.home-feature-title {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+.home-feature-quote {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent-soft);
+}
+
+.home-feature-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.home-feature-word-chip {
+  background: var(--surface-muted);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+}
+
+.home-feature-cta {
+  width: 100%;
+}
+
+.list-row-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* ป้ายสำเนียงเสียงบรรยายของตัวละคร (จริง — มาจาก Character.accent ที่ใช้เลือกเสียง TTS) */
+.home-accent-badge {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  background: var(--surface-muted);
+  border-radius: 5px;
+  padding: 1.5px 5px;
+}
+
+.home-recall-card {
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin: 28px 0;
+}
+
+.home-recall-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.home-recall-header-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.home-recall-listen-all {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.home-recall-header h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.home-recall-header .card-label {
+  margin: 0;
+}
+
+.home-recall-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--highlight-strong);
+  color: var(--highlight-text);
+  flex-shrink: 0;
+}
+
+.home-recall-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.home-recall-word {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  box-shadow: 0 1px 2px rgba(var(--shadow-tint), 0.05);
+}
+
+.home-recall-word-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.home-recall-word-text strong {
+  font-size: 0.88rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-recall-word-def {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-recall-speak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-muted);
+  color: var(--accent);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.home-recall-speak-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.home-calm-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--success-soft);
+  color: var(--text);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin: 20px 0;
+}
+
+.home-calm-banner svg {
+  color: var(--success);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.home-calm-banner strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 2px;
+}
+
+.home-calm-banner p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ---- สมุดคำศัพท์: ตามดีไซน์อ้างอิง vocabulary_notebook_library ---- */
+
+.vocab-mastery-card {
+  background: var(--surface-muted);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.vocab-mastery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.vocab-mastery-eyebrow {
+  margin: 0;
+  color: var(--accent-2);
+}
+
+.vocab-mastery-tag {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.vocab-mastery-bar {
+  display: flex;
+  gap: 3px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--surface-hover);
+  margin-bottom: 12px;
+}
+
+.vocab-mastery-segment {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.vocab-mastery-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.vocab-mastery-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+}
+
+.vocab-mastery-legend-item .status-dot {
+  margin: 0;
+}
+
+.vocab-mastery-legend-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0;
+}
+
+.vocab-mastery-legend-text strong {
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vocab-mastery-legend-text span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vocab-mastery-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.vocab-mastery-footer svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-2);
+}
+
+.vocab-loop-section {
+  margin-bottom: 24px;
+}
+
+.vocab-loop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.vocab-loop-header h3 {
+  margin: 0;
+}
+
+.vocab-loop-listen-all {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.vocab-word-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px 14px;
+}
+
+.vocab-word-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.vocab-word-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vocab-word-main strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.vocab-word-speak {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.vocab-word-speak:active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.vocab-word-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.vocab-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  background: var(--surface-muted);
+  border-radius: 5px;
+  padding: 2.5px 7px;
+}
+
+.vocab-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+}
+
+.vocab-context-quote {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+
+.vocab-context-quote p {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+
+.vocab-context-source {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.vocab-tip-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--accent-soft);
+  color: var(--text);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-top: 28px;
+}
+
+.vocab-tip-card svg {
+  color: var(--accent-strong);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vocab-tip-card strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 2px;
+}
+
+.vocab-tip-card p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ---- ตั้งค่า: ตามดีไซน์อ้างอิง profile_learning_settings ---- */
+
+.corpus-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.corpus-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+}
+
+.corpus-row-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.accent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.accent-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+  padding: 4px 4px 4px 12px;
+  gap: 6px;
+}
+
+.accent-option-selected {
+  background: linear-gradient(155deg, var(--accent), var(--accent-strong));
+  color: #fff;
+}
+
+.accent-option-label {
+  flex: 1;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.accent-option-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  color: inherit;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.accent-option:not(.accent-option-selected) .accent-option-play {
+  background: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+.settings-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-action-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.settings-action-link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.settings-action-danger {
+  color: var(--accent-strong);
+}
+
+/* หัวข้อแต่ละ section ลอยอยู่เหนือการ์ด (ไอคอน + ชื่อหัวข้อ) แยกจากกรอบการ์ดด้านล่าง
+   ตาม flex items-center gap-2 px-1 ของดีไซน์อ้างอิง แทนที่จะใส่ h3 ไว้ในการ์ดตรงๆ */
+.settings-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 4px 10px;
+  color: var(--accent-strong);
+}
+
+.settings-section-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text);
 }

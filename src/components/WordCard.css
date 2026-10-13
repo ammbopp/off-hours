@@ -1,7 +1,7 @@
 .word-card-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(var(--shadow-tint), 0.45);
+  background: rgba(var(--shadow-tint), 0.5);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
   display: flex;
@@ -20,14 +20,16 @@
   }
 }
 
+/* การ์ดใช้สี inverse-surface เสมอ (มืดทั้งสองธีม) ไม่ใช่ --surface ของหน้าปกติ — ให้ความรู้สึกเหมือน
+   สปอตไลต์ส่องคำเดียว แยกตัวออกจากพื้นหลังชัดเจนไม่ว่าหน้าจะเป็นโหมดไหนหรือสีกระดาษโทนไหน */
 .word-card {
-  background: var(--surface);
-  color: var(--text);
+  background: var(--inverse-surface);
+  color: var(--inverse-on-surface);
   width: 100%;
   max-width: 480px;
   border-radius: 24px 24px 0 0;
   padding: 10px 22px 26px;
-  box-shadow: 0 -8px 40px rgba(var(--shadow-tint), 0.3);
+  box-shadow: 0 -8px 40px rgba(var(--shadow-tint), 0.35);
   animation: sheet-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -47,18 +49,30 @@
   width: 36px;
   height: 4px;
   border-radius: var(--radius-full);
-  background: var(--border-strong);
+  background: rgba(var(--shadow-tint), 0.3);
   margin: 0 auto 14px;
 }
 
 .word-card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 600;
+  gap: 10px;
   margin-bottom: 10px;
+}
+
+.word-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.word-card-title strong {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--highlight-strong);
 }
 
 .word-card-speak {
@@ -67,42 +81,80 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: var(--surface-muted);
+  background: rgba(var(--shadow-tint), 0.25);
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: var(--accent);
+  color: var(--highlight-strong);
   flex-shrink: 0;
 }
 
-.word-card-actions {
+.word-card-headword {
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.word-card-pos {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--highlight-strong);
+  margin-right: 6px;
+}
+
+.word-card-definition {
+  font-size: 0.92rem;
+  opacity: 0.85;
+  margin: 2px 0 0;
+}
+
+.word-card-translation {
+  font-size: 1.05rem;
+  margin: 4px 0 0;
+}
+
+.word-card-unknown {
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.word-card-example {
+  font-family: var(--font-reading);
+  font-style: italic;
+  font-size: 0.92rem;
+  opacity: 0.8;
+  line-height: 1.5;
+  background: rgba(var(--shadow-tint), 0.2);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  margin: 10px 0 0;
+}
+
+.word-card-footer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(var(--shadow-tint), 0.3);
 }
 
 .word-card-badge {
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--accent-2);
-  background: var(--accent-2-soft);
-  border-radius: var(--radius-full);
-  padding: 3px 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
 }
 
-.word-card-headword {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin: 0 0 10px;
-}
-
-.word-card-definition {
-  font-size: 0.92rem;
-  color: var(--text-muted);
-  margin: 10px 0 0;
-  padding-top: 10px;
-  border-top: 1px dashed var(--border);
+.word-card-saved {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: var(--highlight-strong);
 }
 
 .word-card-sentence {
@@ -114,44 +166,22 @@
   width: 100%;
   padding: 11px;
   border-radius: var(--radius-sm);
-  border: 1.5px solid var(--border);
-  background: var(--surface-muted);
-  color: var(--text);
+  border: 1px solid rgba(var(--shadow-tint), 0.3);
+  background: transparent;
+  color: var(--inverse-on-surface);
   cursor: pointer;
   font-weight: 500;
 }
 
-.word-card-translation {
-  font-size: 1.05rem;
-  margin: 4px 0;
-}
-
-.word-card-pos {
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 400;
-}
-
-.word-card-example {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-style: italic;
-}
-
-.word-card-unknown {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-style: italic;
-}
-
 .word-card-close {
-  margin-top: 14px;
+  margin-top: 10px;
   width: 100%;
   padding: 13px;
   border-radius: var(--radius-full);
   border: none;
-  background: var(--surface-muted);
-  color: var(--text);
-  font-weight: 600;
+  background: transparent;
+  color: var(--inverse-on-surface);
+  opacity: 0.6;
+  font-weight: 500;
   cursor: pointer;
 }

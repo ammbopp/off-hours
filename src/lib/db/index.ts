@@ -113,6 +113,12 @@ export async function getAllProgress(): Promise<ReadingProgress[]> {
   return (await getDB()).getAll('progress')
 }
 
+// ล้างเฉพาะตำแหน่งที่อ่านค้างไว้/อ่านจบแล้ว ไม่แตะสถานะคำศัพท์ (status/encounters/srs) เพราะนั่นคือ
+// ความคืบหน้าการเรียนรู้จริงที่ไม่ควรเสียไปพร้อมกับการ "เริ่มอ่านใหม่"
+export async function clearAllProgress(): Promise<void> {
+  await (await getDB()).clear('progress')
+}
+
 // อัปเดตแบบรวมกับของเดิมเสมอ ไม่เขียนทับทั้งก้อน เพราะมีสองจุดที่เขียนความคืบหน้าพร้อมกันได้
 // (การเลื่อนจอ/เสียงบรรยาย เขียน lastSentenceIndex ส่วนปุ่ม "อ่านจบตอนนี้" เขียน finishedAt)
 // และ lastSentenceIndex เดินหน้าอย่างเดียว กันไม่ให้ค่าถอยหลังเมื่อผู้ใช้เลื่อนกลับขึ้นไป

@@ -11,6 +11,7 @@ export type EncounterResult = 'looked_up' | 'answered_correctly' | 'used_correct
 export interface WordEncounter {
   mode: EncounterMode
   episodeId?: string
+  characterId?: string // สำหรับ mode 'chat'/'call' — ใช้คำนี้ในบทสนทนากับตัวละครไหน
   at: string // ISO date
   result: EncounterResult
 }

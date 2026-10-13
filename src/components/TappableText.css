@@ -1,7 +1,9 @@
 .tappable-paragraph {
-  line-height: 1.85;
-  margin: 0 0 1.1em;
-  font-size: 1.05rem;
+  font-family: var(--font-reading);
+  line-height: 1.7;
+  margin: 0 0 1.2em;
+  font-size: 1.1rem;
+  letter-spacing: 0.005em;
 }
 
 .tappable-word {
@@ -15,7 +17,7 @@
   color: inherit;
   cursor: pointer;
   border-radius: 4px;
-  transition: background-color 0.1s ease;
+  transition: background-color 0.15s ease;
   outline-offset: 2px;
 }
 
@@ -34,11 +36,17 @@
   background: var(--highlight);
 }
 
+/* คำเป้าหมาย: ตัวเอียง + พื้นหลังโทนอำพันจาง ตามสเปกดีไซน์ (ไม่ใช่เส้นใต้หยักแบบเดิม) */
 .tappable-word-target {
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-style: wavy;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 1.4px;
-  text-underline-offset: 4px;
+  font-style: italic;
+  font-weight: 500;
+  background: var(--highlight);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* คำที่การ์ดคำศัพท์กำลังเปิดอยู่ — พื้นหลังทึบเข้มกว่าคำเป้าหมายอื่นที่ยังไม่ได้แตะ */
+.tappable-word-selected {
+  background: var(--highlight-strong);
+  color: var(--text);
 }

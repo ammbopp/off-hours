@@ -5,11 +5,10 @@ import { WordCard } from '../components/WordCard'
 import { ReadingSettingsSheet } from '../components/ReadingSettingsSheet'
 import { PauseIcon, PlayIcon } from '../components/icons'
 import { getAllEpisodes, getAllWords, getProgress, getSettings, putSettings, putWord, updateProgress } from '../lib/db'
-import { applyPreferences } from '../lib/theme'
 import { recordEncounter } from '../lib/srs'
 import { makeBlankWord } from '../lib/wordlists/import'
 import { buildWordIndex, lookupWord } from '../features/reading/lookup'
-import { parseText, type ParsedSentence } from '../features/reading/text'
+import { estimateReadMinutes, parseText, type ParsedSentence } from '../features/reading/text'
 import { useNarration, type NarrationRate } from '../features/reading/useNarration'
 import { DEFAULT_SETTINGS, type ContextualTranslation, type Episode, type Settings, type Word } from '../types'
 
@@ -22,6 +21,12 @@ interface SelectedWord {
 
 const RATES: NarrationRate[] = [0.75, 1, 1.25]
 
+const READING_THEME_SWATCHES: { value: Settings['readingTheme']; color: string }[] = [
+  { value: 'paper', color: '#f6efe1' },
+  { value: 'sepia', color: '#f1e2c0' },
+  { value: 'night', color: '#000000' },
+]
+
 export function ReadPage() {
   const { episodeId } = useParams<{ episodeId?: string }>()
   const [episodes, setEpisodes] = useState<Episode[]>([])
@@ -31,6 +36,7 @@ export function ReadPage() {
   const [finished, setFinished] = useState(false)
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
   const [showReaderSettings, setShowReaderSettings] = useState(false)
+  const [progressPercent, setProgressPercent] = useState(0)
 
   const furthestSentenceRef = useRef(0)
   // แพทเทิร์นเดียวกับ SettingsPage: ปุ่มปรับหน้าตาใช้ผลทันที+บันทึกทันที ต้องอ่านค่าล่าสุดผ่าน ref
@@ -48,22 +54,13 @@ export function ReadPage() {
     })
   }, [])
 
-  // ขนาดตัวอักษรใน panel นี้คือตัวเดียวกับที่ตั้งค่าไว้ทั้งแอป (ไม่ใช่สเกลแยกของหน้าอ่าน) จึงต้อง
-  // applyPreferences ให้ขนาดเปลี่ยนทันทีทั่วแอป ไม่ใช่แค่ในหน้านี้ เหมือนที่ทำใน SettingsPage
-  const { fontSize } = settings
-  useEffect(() => {
-    if (!loadedSettingsRef.current) return
-    applyPreferences({ theme: settingsRef.current.theme, fontSize })
-    void putSettings(settingsRef.current)
-  }, [fontSize])
-
-  // readingFont/readingTheme มีผลแค่ในหน้าอ่าน (ผ่าน data-attribute บน .reader-page) ไม่กระทบ <html>
-  // ทั้งแอป จึงบันทึกเฉยๆ ไม่ต้องเรียก applyPreferences
-  const { readingFont, readingTheme } = settings
+  // readingFont/readingTheme/readingFontSize มีผลแค่ในหน้าอ่าน (ผ่าน data-attribute บน .reader-page)
+  // ไม่กระทบ <html> ทั้งแอป — คนละค่ากับ fontSize ของทั้งแอปด้านบน จึงบันทึกเฉยๆ ไม่ต้องเรียก applyPreferences
+  const { readingFont, readingTheme, readingFontSize } = settings
   useEffect(() => {
     if (!loadedSettingsRef.current) return
     void putSettings(settingsRef.current)
-  }, [readingFont, readingTheme])
+  }, [readingFont, readingTheme, readingFontSize])
 
   const index = episodeId ? episodes.findIndex((e) => e.id === episodeId) : 0
   const episode = episodes[index === -1 ? 0 : index] ?? null
@@ -80,19 +77,43 @@ export function ReadPage() {
     return new Set(terms)
   }, [episode, words])
 
+  const estimatedMinutes = useMemo(() => (episode ? estimateReadMinutes(episode.content) : 0), [episode])
+
   // ไม่แตะ finishedAt ตรงนี้ ปล่อยให้ updateProgress รักษาค่าเดิมไว้
   // (เคยมีบั๊ก: callback ที่ค้างค่า finished เก่าไว้เขียนทับ finishedAt กลับเป็น null หลังกดอ่านจบ)
   const saveProgress = useCallback(
     (sentenceIndex: number) => {
       if (!episode) return
       furthestSentenceRef.current = Math.max(furthestSentenceRef.current, sentenceIndex)
+      if (parsed.sentences.length > 0) {
+        setProgressPercent(Math.min(100, Math.round(((furthestSentenceRef.current + 1) / parsed.sentences.length) * 100)))
+      }
       void updateProgress(episode.id, { lastSentenceIndex: furthestSentenceRef.current })
     },
-    [episode],
+    [episode, parsed.sentences.length],
   )
 
-  const narration = useNarration(parsed.sentences, { onSentenceStart: (i) => saveProgress(i) })
+  const narration = useNarration(parsed.sentences, {
+    onSentenceStart: (i) => saveProgress(i),
+    accent: settings.narratorAccent,
+    initialRate: settings.narrationRate,
+  })
   const { activeIndex, playing, rate, setRate, speakFrom, stop } = narration
+
+  // ตั้งความเร็วตามค่าที่บันทึกไว้ครั้งเดียวตอนโหลด settings เสร็จ (initialRate ของ useNarration ใช้ได้
+  // แค่ตอน mount แรกเท่านั้น เพราะตอนนั้น settings ยังเป็นค่า DEFAULT_SETTINGS อยู่ โหลดจริงเสร็จทีหลัง)
+  // ส่วนการสลับเร็ว/ช้าระหว่างอ่าน (cycleRate ด้านล่าง) จะบันทึกทับค่านี้เองเมื่อผู้ใช้กด
+  useEffect(() => {
+    if (!loadedSettingsRef.current) return
+    setRate(settingsRef.current.narrationRate)
+  }, [settings.narrationRate, setRate])
+
+  function cycleRate() {
+    const next = RATES[(RATES.indexOf(rate) + 1) % RATES.length]
+    setRate(next)
+    setSettings((prev) => ({ ...prev, narrationRate: next }))
+    void putSettings({ ...settingsRef.current, narrationRate: next })
+  }
 
   // โหลดตำแหน่งที่อ่านค้างไว้ของตอนนี้
   // มี cancelled guard เพราะกด "ตอนต่อไป" ซ้ำเร็วๆ ได้ (คลิกเดียวก็ไปตอนถัดไปทันที คอมโพเนนต์ไม่ unmount
@@ -104,18 +125,22 @@ export function ReadPage() {
     furthestSentenceRef.current = 0
     setResumeIndex(null)
     setFinished(false)
+    setProgressPercent(0)
 
     getProgress(episode.id).then((progress) => {
       if (cancelled || !progress) return
       furthestSentenceRef.current = progress.lastSentenceIndex
       setFinished(Boolean(progress.finishedAt))
       if (progress.lastSentenceIndex > 0) setResumeIndex(progress.lastSentenceIndex)
+      if (parsed.sentences.length > 0) {
+        setProgressPercent(Math.min(100, Math.round(((progress.lastSentenceIndex + 1) / parsed.sentences.length) * 100)))
+      }
     })
 
     return () => {
       cancelled = true
     }
-  }, [episode])
+  }, [episode, parsed.sentences.length])
 
   // หยุดเสียงเมื่อเปลี่ยนตอน
   useEffect(() => {
@@ -128,7 +153,7 @@ export function ReadPage() {
     document.getElementById(`sentence-${activeIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [activeIndex])
 
-  // จำว่าอ่านถึงประโยคไหนจากการเลื่อนจอ เพื่อเปิดอ่านต่อครั้งหน้าได้
+  // จำว่าอ่านถึงประโยคไหนจากการเลื่อนจอ เพื่อเปิดอ่านต่อครั้งหน้าได้ และอัปเดตแถบความคืบหน้า
   useEffect(() => {
     if (!episode || parsed.sentences.length === 0) return
 
@@ -139,6 +164,7 @@ export function ReadPage() {
           const sentenceIndex = Number((entry.target as HTMLElement).dataset.sentence)
           if (Number.isFinite(sentenceIndex)) {
             furthestSentenceRef.current = Math.max(furthestSentenceRef.current, sentenceIndex)
+            setProgressPercent(Math.min(100, Math.round(((sentenceIndex + 1) / parsed.sentences.length) * 100)))
           }
         }
       },
@@ -189,6 +215,7 @@ export function ReadPage() {
     if (!episode) return
     setFinished(true)
     furthestSentenceRef.current = Math.max(furthestSentenceRef.current, parsed.sentences.length - 1)
+    setProgressPercent(100)
     await updateProgress(episode.id, {
       lastSentenceIndex: furthestSentenceRef.current,
       finishedAt: new Date().toISOString(),
@@ -204,29 +231,25 @@ export function ReadPage() {
   }
 
   return (
-    <div className="page">
+    <div className="page reader-page-outer">
+      <div className="reader-progress-track">
+        <div className="reader-progress-fill" style={{ width: `${progressPercent}%` }} />
+      </div>
+
       <div className="reader-toolbar-row">
-        <div className="reader-toolbar">
-          {narration.supported ? (
-            <>
-              <button className="button" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))}>
-                {playing ? <PauseIcon size={16} /> : <PlayIcon size={16} />}
-                {playing ? 'หยุดเสียง' : 'ฟังเสียงบรรยาย'}
-              </button>
-              <div className="reader-rates">
-                {RATES.map((r) => (
-                  <button key={r} className={r === rate ? 'chip chip-active' : 'chip'} onClick={() => setRate(r)}>
-                    {r}×
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className="card-label">เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน</p>
-          )}
+        <div className="reader-eyebrow-block">
+          <span className="eyebrow reader-eyebrow">
+            <span className="reader-eyebrow-dot" />
+            ตอนที่ {episode.order}
+          </span>
         </div>
-        <button className="reader-aa-button" onClick={() => setShowReaderSettings(true)} aria-label="ตัวอักษรและพื้นหลัง">
-          Aa
+        <button className="reader-aa-pill" onClick={() => setShowReaderSettings(true)} aria-label="ตัวอักษรและพื้นหลัง">
+          <span className="reader-aa-label">Aa</span>
+          <span className="reader-aa-swatches">
+            {READING_THEME_SWATCHES.map((s) => (
+              <span key={s.value} className="reader-aa-swatch" style={{ background: s.color }} />
+            ))}
+          </span>
         </button>
       </div>
 
@@ -244,15 +267,32 @@ export function ReadPage() {
         </button>
       )}
 
-      <div className="reader-page" data-reading-theme={settings.readingTheme} data-reading-font={settings.readingFont}>
+      <div
+        className="reader-page"
+        data-reading-theme={settings.readingTheme}
+        data-reading-font={settings.readingFont}
+        data-reading-font-size={settings.readingFontSize}
+      >
+        <div className="reader-atmosphere" aria-hidden>
+          <span className="reader-atmosphere-dot" />
+          <span>คำเป้าหมาย {episode.targetWordIds.length} คำ</span>
+          <span className="reader-atmosphere-sep">·</span>
+          <span>{estimatedMinutes} นาที</span>
+        </div>
+
         <h1>{episode.title}</h1>
 
         <TappableText
           paragraphs={parsed.paragraphs}
           targetTerms={targetTerms}
           activeSentenceIndex={activeIndex}
+          selectedTerm={selected?.term.toLowerCase() ?? null}
           onWordTap={handleWordTap}
         />
+
+        <div className="reader-calm-strip">
+          <span>ไม่มีตัวจับเวลา ไม่มีคะแนน อ่านได้ตามจังหวะของตัวเอง</span>
+        </div>
 
         <div className="read-footer">
           <button className="button" onClick={finishEpisode} disabled={finished}>
@@ -269,6 +309,34 @@ export function ReadPage() {
         </div>
       </div>
 
+      {narration.supported && (
+        <aside className="reader-audio-bar">
+          <button className="reader-audio-play" onClick={() => (playing ? stop() : speakFrom(activeIndex ?? 0))} aria-label={playing ? 'หยุดเสียง' : 'ฟังเสียงบรรยาย'}>
+            {playing ? <PauseIcon size={20} /> : <PlayIcon size={20} />}
+          </button>
+          <div className="reader-audio-meta">
+            <div className="reader-audio-meta-row">
+              <span>เสียงบรรยาย</span>
+              <span className="reader-audio-position">
+                {activeIndex !== null ? activeIndex + 1 : 0} / {parsed.sentences.length}
+              </span>
+            </div>
+            <div className="reader-audio-wave" aria-hidden>
+              {Array.from({ length: 16 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={playing ? 'reader-audio-bar-el reader-audio-bar-animated' : 'reader-audio-bar-el'}
+                  style={{ height: `${6 + ((i * 7) % 14)}px`, animationDelay: `${i * 0.06}s` }}
+                />
+              ))}
+            </div>
+          </div>
+          <button className="reader-audio-speed" onClick={cycleRate}>
+            {rate}×
+          </button>
+        </aside>
+      )}
+
       {selected && (
         <WordCard
           term={selected.term}
@@ -281,10 +349,10 @@ export function ReadPage() {
 
       {showReaderSettings && (
         <ReadingSettingsSheet
-          fontSize={settings.fontSize}
+          readingFontSize={settings.readingFontSize}
           readingFont={settings.readingFont}
           readingTheme={settings.readingTheme}
-          onFontSizeChange={(fontSize) => setSettings((prev) => ({ ...prev, fontSize }))}
+          onReadingFontSizeChange={(readingFontSize) => setSettings((prev) => ({ ...prev, readingFontSize }))}
           onReadingFontChange={(readingFont) => setSettings((prev) => ({ ...prev, readingFont }))}
           onReadingThemeChange={(readingTheme) => setSettings((prev) => ({ ...prev, readingTheme }))}
           onClose={() => setShowReaderSettings(false)}

@@ -88,6 +88,14 @@ export function ChevronRightIcon(props: IconProps) {
   )
 }
 
+export function ChevronLeftIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="m15 6-6 6 6 6" />
+    </svg>
+  )
+}
+
 export function SpeakerIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
@@ -127,6 +135,41 @@ export function CheckIcon(props: IconProps) {
   return (
     <svg {...base(props)}>
       <path d="m5 12.5 4.5 4.5L19 7" />
+    </svg>
+  )
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" />
+    </svg>
+  )
+}
+
+export function ClockIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  )
+}
+
+export function CompassIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m14.5 9.5-1.8 4.3-4.3 1.8 1.8-4.3Z" />
+    </svg>
+  )
+}
+
+export function ShieldIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3.5 5 6v5.5c0 4.4 3 7.8 7 9 4-1.2 7-4.6 7-9V6Z" />
+      <path d="m9 12 2.2 2.2L15.5 10" />
     </svg>
   )
 }

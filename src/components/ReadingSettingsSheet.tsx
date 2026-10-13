@@ -3,10 +3,10 @@ import type { FontSize, ReadingFont, ReadingTheme } from '../types'
 import './WordCard.css'
 
 interface ReadingSettingsSheetProps {
-  fontSize: FontSize
+  readingFontSize: FontSize
   readingFont: ReadingFont
   readingTheme: ReadingTheme
-  onFontSizeChange: (value: FontSize) => void
+  onReadingFontSizeChange: (value: FontSize) => void
   onReadingFontChange: (value: ReadingFont) => void
   onReadingThemeChange: (value: ReadingTheme) => void
   onClose: () => void
@@ -29,10 +29,10 @@ const READING_THEMES: { value: ReadingTheme; label: string; swatch: string }[] =
 // แผงปรับความสบายตาของหน้าอ่าน — ขนาดตัวอักษร รูปแบบตัวอักษร และสีพื้นหลัง แยกจากธีมสีของทั้งแอป
 // เหมือนปุ่ม "Aa" ในแอปอ่านหนังสือทั่วไป เพื่อให้ผู้ใช้ปรับได้ทันทีระหว่างอ่านโดยไม่ต้องออกไปหน้าตั้งค่า
 export function ReadingSettingsSheet({
-  fontSize,
+  readingFontSize,
   readingFont,
   readingTheme,
-  onFontSizeChange,
+  onReadingFontSizeChange,
   onReadingFontChange,
   onReadingThemeChange,
   onClose,
@@ -51,8 +51,8 @@ export function ReadingSettingsSheet({
             {FONT_SIZES.map((f) => (
               <button
                 key={f.value}
-                className={fontSize === f.value ? 'button button-selected' : 'button button-outline'}
-                onClick={() => onFontSizeChange(f.value)}
+                className={readingFontSize === f.value ? 'button button-selected' : 'button button-outline'}
+                onClick={() => onReadingFontSizeChange(f.value)}
               >
                 {f.label}
               </button>
@@ -72,7 +72,7 @@ export function ReadingSettingsSheet({
             </button>
             <button
               className={readingFont === 'serif' ? 'button button-selected reading-font-sample' : 'button button-outline reading-font-sample'}
-              style={{ fontFamily: "'Lora', serif" }}
+              style={{ fontFamily: 'var(--font-reading)' }}
               onClick={() => onReadingFontChange('serif')}
             >
               Aa มีเชิง
